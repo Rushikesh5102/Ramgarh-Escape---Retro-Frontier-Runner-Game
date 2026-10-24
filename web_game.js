@@ -185,6 +185,9 @@
       if (!SaveManager.isMuted) {
         this.playBGM('', true); // Player explicitly clicked Jukebox -> switch and start new track
       }
+      try {
+        window.dispatchEvent(new CustomEvent('ramgarh-track-changed', { detail: { title: this.tracks[this.currentTrackIdx].title } }));
+      } catch (e) {}
       return this.tracks[this.currentTrackIdx].title;
     }
 
@@ -203,6 +206,9 @@
           this.bgmPlayer.play().catch(() => {});
         }
       }
+      try {
+        window.dispatchEvent(new CustomEvent('ramgarh-mute-changed', { detail: { isMuted: SaveManager.isMuted } }));
+      } catch (e) {}
     }
 
     // Play authentic studio sound effect
@@ -1706,6 +1712,56 @@
       if (gameState === State.RUNNING) player.cutJump();
     }
   });
+
+  // Expose clean public interface for mobile gamepad and external controls
+  window.RamgarhGame = {
+    jump() {
+      audio.unlock();
+      if (gameState === State.RUNNING) {
+        player.jump();
+      } else if (gameState === State.MENU || gameState === State.GAME_OVER) {
+        startGame();
+      }
+    },
+    cutJump() {
+      if (gameState === State.RUNNING) {
+        player.cutJump();
+      }
+    },
+    nextTrack() {
+      audio.unlock();
+      return audio.nextTrack();
+    },
+    toggleMute() {
+      audio.unlock();
+      SaveManager.isMuted = !SaveManager.isMuted;
+      SaveManager.save();
+      audio.applyMute();
+      return SaveManager.isMuted;
+    },
+    togglePause() {
+      audio.unlock();
+      if (gameState === State.RUNNING) {
+        gameState = State.PAUSED;
+      } else if (gameState === State.PAUSED) {
+        gameState = State.RUNNING;
+      }
+      return gameState === State.PAUSED;
+    },
+    startGame() {
+      audio.unlock();
+      startGame();
+    },
+    getCurrentTrackTitle() {
+      return audio.getCurrentTrackTitle();
+    },
+    isMuted() {
+      return SaveManager.isMuted;
+    },
+    getState() {
+      return gameState;
+    }
+  };
 
   // Kickoff game loop
   requestAnimationFrame(gameLoop);
