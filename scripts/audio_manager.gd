@@ -50,21 +50,29 @@ func _ready() -> void:
 	apply_audio_settings()
 
 var bgm_tracks: Dictionary = {}
-var track_titles: Array[String] = ["Yeh Dosti", "Chal Dhanno!", "Mehbooba Groove", "Frontier Escape"]
+var track_titles: Array[String] = ["Yeh Dosti", "Chal Dhanno!", "Mehbooba Groove", "Frontier Escape", "Koi Haseena"]
 var current_track_idx: int = 0
 signal track_changed(track_title: String)
 
 func load_bgm_tracks() -> void:
 	var files = {
-		"Yeh Dosti": "res://assets/audio/bgm_yeh_dosti.wav",
-		"Chal Dhanno!": "res://assets/audio/bgm_chal_dhanno.wav",
-		"Mehbooba Groove": "res://assets/audio/bgm_mehbooba.wav",
-		"Frontier Escape": "res://assets/audio/bgm_escape.wav"
+		"Yeh Dosti": ["res://assets/audio/bgm_yeh_dosti.mp3", "res://assets/audio/bgm_yeh_dosti.wav"],
+		"Chal Dhanno!": ["res://assets/audio/bgm_chal_dhanno.mp3", "res://assets/audio/bgm_chal_dhanno.wav"],
+		"Mehbooba Groove": ["res://assets/audio/bgm_mehbooba.mp3", "res://assets/audio/bgm_mehbooba.wav"],
+		"Frontier Escape": ["res://assets/audio/bgm_escape.mp3", "res://assets/audio/bgm_escape.wav"],
+		"Koi Haseena": ["res://assets/audio/bgm_koi_haseena.mp3"]
 	}
 	for title in files.keys():
-		var stream = load(files[title])
+		var stream = null
+		for path in files[title]:
+			if ResourceLoader.exists(path):
+				stream = load(path)
+				if stream != null:
+					break
 		if stream is AudioStreamWAV:
 			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		elif stream is AudioStreamMP3:
+			stream.loop = true
 		bgm_tracks[title] = stream
 
 func apply_audio_settings() -> void:

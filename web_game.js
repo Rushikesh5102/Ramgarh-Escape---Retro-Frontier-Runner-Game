@@ -75,34 +75,27 @@
   };
 
   // -------------------------------------------------------------
-  // 2. BULLETPROOF BOLLYWOOD AUDIO ENGINE (SYNTH + WAV DUAL ENGINE)
+  // 2. AUTHENTIC BOLLYWOOD AUDIO ENGINE (STUDIO MP3s + CRISP WAV SFX)
   // -------------------------------------------------------------
   class SoundManager {
     constructor() {
-      this.audioCtx = null;
-      this.masterGain = null;
       this.isUnlocked = false;
-      this.bgmTimer = null;
-      this.synthPlaying = false;
-      this.wavPlaying = false;
 
+      // Authentic Bollywood Studio Soundtracks from Sholay
       this.tracks = [
-        { title: 'Yeh Dosti', file: 'assets/audio/bgm_yeh_dosti.wav' },
-        { title: 'Chal Dhanno!', file: 'assets/audio/bgm_chal_dhanno.wav' },
-        { title: 'Mehbooba Groove', file: 'assets/audio/bgm_mehbooba.wav' },
-        { title: 'Frontier Escape', file: 'assets/audio/bgm_escape.wav' }
+        { title: 'Yeh Dosti', file: 'assets/audio/bgm_yeh_dosti.mp3' },
+        { title: 'Mehbooba Groove', file: 'assets/audio/bgm_mehbooba.mp3' },
+        { title: 'Chal Dhanno!', file: 'assets/audio/bgm_chal_dhanno.mp3' },
+        { title: 'Frontier Escape', file: 'assets/audio/bgm_escape.mp3' },
+        { title: 'Koi Haseena', file: 'assets/audio/bgm_koi_haseena.mp3' }
       ];
       this.currentTrackIdx = 0;
+      this.activeTrackTitle = '';
 
-      // Studio WAV Audio Elements
-      this.bgmPlayers = this.tracks.map(t => {
-        const a = new Audio();
-        a.src = t.file;
-        a.loop = true;
-        a.preload = 'auto';
-        a.volume = 0.8;
-        return a;
-      });
+      // High-performance streaming audio element
+      this.bgmPlayer = new Audio();
+      this.bgmPlayer.loop = true;
+      this.bgmPlayer.volume = 0.85;
 
       this.sfxFiles = {
         jump: 'assets/audio/sfx_jump.wav',
@@ -121,7 +114,7 @@
         jhumka: 'assets/audio/sfx_jhumka.wav'
       };
 
-      // SFX Audio Pool
+      // SFX Audio Pool for crisp zero-latency sound effects
       this.sfxPool = {};
       for (const [name, file] of Object.entries(this.sfxFiles)) {
         const list = [];
@@ -134,78 +127,55 @@
         }
         this.sfxPool[name] = { list, idx: 0 };
       }
-
-      this.initWebAudio();
-    }
-
-    initWebAudio() {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        try {
-          this.audioCtx = new AudioContextClass();
-          this.masterGain = this.audioCtx.createGain();
-          this.masterGain.gain.setValueAtTime(SaveManager.isMuted ? 0 : 0.7, this.audioCtx.currentTime);
-          this.masterGain.connect(this.audioCtx.destination);
-        } catch (e) {}
-      }
     }
 
     unlock() {
-      if (!this.audioCtx) this.initWebAudio();
-      if (this.audioCtx && this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume();
-      }
+      if (this.isUnlocked) return;
       this.isUnlocked = true;
+      if (this.bgmPlayer && this.activeTrackTitle && this.bgmPlayer.paused && !SaveManager.isMuted) {
+        this.bgmPlayer.play().catch(() => {});
+      }
     }
 
-    // Play BGM with dual reliability: plays WAV or instant synthesized Bollywood melody
+    // Play authentic Bollywood studio MP3 soundtrack
     playBGM(trackTitle = '') {
       if (SaveManager.isMuted) return;
-      this.unlock();
 
       if (trackTitle) {
-        const idx = this.tracks.findIndex(t => t.title === trackTitle);
+        const idx = this.tracks.findIndex(t => t.title.toLowerCase() === trackTitle.toLowerCase());
         if (idx !== -1) this.currentTrackIdx = idx;
       }
 
-      // Stop any other active WAV streams
-      this.bgmPlayers.forEach((player, i) => {
-        if (i !== this.currentTrackIdx) {
-          player.pause();
-          player.currentTime = 0;
-        }
-      });
+      const track = this.tracks[this.currentTrackIdx];
+      if (this.activeTrackTitle === track.title && !this.bgmPlayer.paused) {
+        return; // already smoothly playing this song
+      }
 
-      const current = this.bgmPlayers[this.currentTrackIdx];
-      current.muted = SaveManager.isMuted;
-      current.volume = 0.8;
+      this.activeTrackTitle = track.title;
+      this.bgmPlayer.src = track.file;
+      this.bgmPlayer.currentTime = 0;
+      this.bgmPlayer.muted = SaveManager.isMuted;
+      this.bgmPlayer.volume = 0.85;
 
-      let playedWav = false;
-      const playPromise = current.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          this.wavPlaying = true;
-          this.stopSynthMelody();
-        }).catch(() => {
-          // WAV streaming delayed/blocked -> immediately start Web Audio synthesizer!
-          this.startSynthMelody();
+      const p = this.bgmPlayer.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          // Will resume seamlessly upon the user's next tap / keystroke
         });
-      } else {
-        this.startSynthMelody();
       }
     }
 
     stopBGM() {
-      this.bgmPlayers.forEach(p => {
-        p.pause();
-        p.currentTime = 0;
-      });
-      this.stopSynthMelody();
+      this.activeTrackTitle = '';
+      if (this.bgmPlayer) {
+        this.bgmPlayer.pause();
+        this.bgmPlayer.currentTime = 0;
+      }
     }
 
     nextTrack() {
       this.currentTrackIdx = (this.currentTrackIdx + 1) % this.tracks.length;
-      if (gameState === State.RUNNING && !SaveManager.isMuted) {
+      if (!SaveManager.isMuted) {
         this.playBGM();
       }
       return this.tracks[this.currentTrackIdx].title;
@@ -216,89 +186,22 @@
     }
 
     applyMute() {
-      this.bgmPlayers.forEach(p => { p.muted = SaveManager.isMuted; });
-      if (this.masterGain && this.audioCtx) {
-        this.masterGain.gain.setValueAtTime(SaveManager.isMuted ? 0 : 0.7, this.audioCtx.currentTime);
+      if (this.bgmPlayer) {
+        this.bgmPlayer.muted = SaveManager.isMuted;
       }
       if (SaveManager.isMuted) {
-        this.stopSynthMelody();
+        if (this.bgmPlayer) this.bgmPlayer.pause();
+      } else {
+        if (this.activeTrackTitle && this.bgmPlayer) {
+          this.bgmPlayer.play().catch(() => {});
+        }
       }
     }
 
-    // Real-time Web Audio Synthesizer for "Yeh Dosti Hum Nahi Todenge"
-    startSynthMelody() {
-      if (!this.audioCtx || this.synthPlaying || SaveManager.isMuted) return;
-      this.synthPlaying = true;
-
-      // "Yeh Dosti" iconic melody notes (Hz)
-      const notes = [
-        349.23, 392.00, 440.00, 523.25, 440.00, 392.00, 349.23, // F4, G4, A4, C5, A4, G4, F4
-        392.00, 440.00, 523.25, 440.00, 392.00, 349.23, 293.66, // G4, A4, C5, A4, G4, F4, D4
-        261.63, 293.66, 349.23, 392.00, 440.00, 392.00, 349.23  // C4, D4, F4, G4, A4, G4, F4
-      ];
-      const durations = [
-        0.35, 0.35, 0.4, 0.6, 0.35, 0.35, 0.7,
-        0.35, 0.35, 0.4, 0.6, 0.35, 0.35, 0.7,
-        0.35, 0.35, 0.4, 0.5, 0.4, 0.35, 0.9
-      ];
-
-      let noteIdx = 0;
-      const playNextNote = () => {
-        if (!this.synthPlaying || SaveManager.isMuted) return;
-
-        const freq = notes[noteIdx];
-        const dur = durations[noteIdx];
-        noteIdx = (noteIdx + 1) % notes.length;
-
-        try {
-          const ctx = this.audioCtx;
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc.type = 'triangle'; // Warm harmonica tone
-          osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-          // Bass backing note
-          const bassOsc = ctx.createOscillator();
-          bassOsc.type = 'sine';
-          bassOsc.frequency.setValueAtTime(freq / 2.0, ctx.currentTime);
-
-          gain.gain.setValueAtTime(0.2, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-
-          osc.connect(gain);
-          bassOsc.connect(gain);
-          gain.connect(this.masterGain || ctx.destination);
-
-          osc.start(ctx.currentTime);
-          bassOsc.start(ctx.currentTime);
-          osc.stop(ctx.currentTime + dur);
-          bassOsc.stop(ctx.currentTime + dur);
-
-          this.bgmTimer = setTimeout(playNextNote, dur * 1000);
-        } catch (e) {}
-      };
-
-      playNextNote();
-    }
-
-    stopSynthMelody() {
-      this.synthPlaying = false;
-      if (this.bgmTimer) {
-        clearTimeout(this.bgmTimer);
-        this.bgmTimer = null;
-      }
-    }
-
-    // Play SFX with immediate Web Audio synthesis + Audio Pool
+    // Play authentic studio sound effect
     playSFX(name) {
       if (SaveManager.isMuted) return;
-      this.unlock();
 
-      // 1. Instant Web Audio Synthesis
-      this.synthSFX(name);
-
-      // 2. Play cached WAV audio if available
       const pool = this.sfxPool[name];
       if (pool) {
         const a = pool.list[pool.idx];
@@ -310,52 +213,6 @@
           if (p !== undefined) p.catch(() => {});
         } catch (e) {}
       }
-    }
-
-    synthSFX(name) {
-      if (!this.audioCtx || SaveManager.isMuted) return;
-      try {
-        const ctx = this.audioCtx;
-        const now = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.masterGain || ctx.destination);
-
-        if (name === 'jump') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(200, now);
-          osc.frequency.exponentialRampToValueAtTime(520, now + 0.16);
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
-          osc.start(now);
-          osc.stop(now + 0.16);
-        } else if (name === 'coin' || name === 'jhumka') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(987.77, now); // B5
-          osc.frequency.setValueAtTime(1318.51, now + 0.07); // E6
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
-          osc.start(now);
-          osc.stop(now + 0.18);
-        } else if (name === 'hit') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(180, now);
-          osc.frequency.exponentialRampToValueAtTime(45, now + 0.28);
-          gain.gain.setValueAtTime(0.35, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
-          osc.start(now);
-          osc.stop(now + 0.28);
-        } else if (name === 'button') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(600, now);
-          osc.frequency.setValueAtTime(800, now + 0.04);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-          osc.start(now);
-          osc.stop(now + 0.08);
-        }
-      } catch (e) {}
     }
   }
 
