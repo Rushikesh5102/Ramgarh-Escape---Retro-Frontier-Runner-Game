@@ -1,13 +1,18 @@
 # Ramgarh Escape
 
+[![Live Web Game](https://img.shields.io/badge/Play%20Online-GitHub%20Pages-brightgreen.svg?style=for-the-badge&logo=github)](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
 [![Engine](https://img.shields.io/badge/Engine-Godot%204.7.2-blue.svg)](https://godotengine.org)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Android-green.svg)]()
-[![Budget](https://img.shields.io/badge/Budget-%E2%82%B90%20(Free%20%26%20Open%20Source)-orange.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Windows%20%7C%20Android-orange.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](./LICENSES.md)
 
-**"Ramgarh Escape"** is a 2D side-scrolling endless-runner game inspired by retro frontier adventures and buddy comedies.
+> ### 🌐 [Play Ramgarh Escape Live on GitHub Pages](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
+> Instant play in any browser (mobile & desktop) with rich Bollywood soundtracks, Basanti & Dhanno Rush, and social sharing previews!
 
-You control the daring duo—**Veeru** (reckless driver with red headband, denim vest, and comic mustache) and **Jai** (cool companion with aviator shades and witty commentary)—escaping through dusty desert frontiers and rocky sandstone gorges on their vintage sidecar motorcycle.
+![Ramgarh Escape Preview Banner](./preview.png)
+
+**"Ramgarh Escape"** is a 2D endless-runner game inspired by retro frontier adventures and the classic Bollywood epic *Sholay*.
+
+Control the daring duo—**Veeru** and **Jai**—escaping through dusty desert frontiers and rocky sandstone gorges on their vintage sidecar motorcycle, accompanied by **Basanti** in her spirited horse carriage with **Dhanno**!
 
 ---
 

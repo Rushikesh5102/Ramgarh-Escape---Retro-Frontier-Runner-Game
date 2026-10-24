@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Primary Meta Tags -->
+  <title>Ramgarh Escape - Retro Frontier Runner Game</title>
+  <meta name="title" content="Ramgarh Escape - Retro Frontier Runner Game">
+  <meta name="description" content="Play Ramgarh Escape online! Join Jai & Veeru in an action-packed retro frontier chase with Basanti & Dhanno, 4 Bollywood soundtracks, iconic Sholay dialogues, and endless arcade thrills.">
+  <meta name="keywords" content="Ramgarh Escape, Sholay, Jai Veeru, Basanti, Dhanno, Gabbar, Bollywood Game, Endless Runner, Retro Game, Web Game">
+  <meta name="author" content="Ramgarh Studio">
+  <meta name="theme-color" content="#d97706">
+  
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="game">
+  <meta property="og:url" content="https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/">
+  <meta property="og:title" content="Ramgarh Escape - Retro Frontier Runner Game">
+  <meta property="og:description" content="Escape Gabbar's clutches with Jai & Veeru! Featuring Basanti & Dhanno Rush, 4 retro Bollywood soundtracks, iconic Sholay dialogues, and endless arcade action. Play free in browser!">
+  <meta property="og:image" content="https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/preview.png">
+  <meta property="og:image:secure_url" content="https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Ramgarh Escape - Jai & Veeru on BSA Motorcycle with Basanti and Dhanno">
+  <meta property="og:site_name" content="Ramgarh Escape">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/">
+  <meta name="twitter:title" content="Ramgarh Escape - Retro Frontier Runner Game">
+  <meta name="twitter:description" content="Escape Gabbar with Jai, Veeru & Basanti! Featuring 4 Bollywood soundtracks, Dhanno Rush fever mode, and iconic dialogues.">
+  <meta name="twitter:image" content="https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/preview.png">
+  <meta name="twitter:image:alt" content="Ramgarh Escape Preview Banner">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/sprites/icon.svg">
+  <link rel="apple-touch-icon" href="assets/ui/logo.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #1e1318 0%, #0d070b 100%);
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 1152px;
+      max-height: 648px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.2);
+      border: 2px solid rgba(245, 158, 11, 0.4);
+      background: #110c14;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+    /* Mobile / Fullscreen wrapper */
+    @media (max-width: 1152px), (max-height: 648px) {
+      #game-container {
+        border: none;
+        box-shadow: none;
+        max-width: 100vw;
+        max-height: 100vh;
+      }
+    }
+    /* Top Share & Info Bar */
+    #top-bar {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      z-index: 50;
+      display: flex;
+      gap: 10px;
+    }
+    .top-btn {
+      background: rgba(20, 14, 22, 0.85);
+      border: 1px solid rgba(250, 204, 21, 0.6);
+      color: #fef08a;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+    }
+    .top-btn:hover {
+      background: rgba(245, 158, 11, 0.3);
+      transform: translateY(-1px);
+    }
+    /* Toast notification */
+    #toast {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: rgba(18, 12, 18, 0.95);
+      border: 1px solid #f59e0b;
+      color: #fef08a;
+      padding: 8px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="gameCanvas" width="1152" height="648"></canvas>
+    
+    <div id="top-bar">
+      <button class="top-btn" id="shareBtn">
+        <span>🔗 Share Game</span>
+      </button>
+      <button class="top-btn" id="fullscreenBtn">
+        <span>⛶ Fullscreen</span>
+      </button>
+    </div>
+
+    <div id="toast">Link copied to clipboard!</div>
+  </div>
+
+  <script src="web_game.js"></script>
+  <script>
+    // Share & Fullscreen controls
+    const shareBtn = document.getElementById('shareBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    shareBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const shareData = {
+        title: 'Ramgarh Escape - Retro Frontier Runner',
+        text: 'Play Ramgarh Escape with Jai, Veeru & Basanti! Bollywood songs & Dhanno Rush:',
+        url: window.location.href
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {}
+      } else {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          showToast('Game link copied to clipboard!');
+        } catch (err) {
+          showToast(window.location.href);
+        }
+      }
+    });
+
+    fullscreenBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const container = document.getElementById('game-container');
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) container.requestFullscreen();
+        else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>

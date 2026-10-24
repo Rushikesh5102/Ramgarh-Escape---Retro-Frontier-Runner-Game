@@ -55,6 +55,9 @@ if /i "%~1"=="--push" goto :git_push
 if /i "%~1"=="push" goto :git_push
 if /i "%~1"=="7" goto :git_push
 
+if /i "%~1"=="--web" goto :play_web
+if /i "%~1"=="web" goto :play_web
+
 :: -------------------------------------------------------------
 :: INTERACTIVE COMMAND CENTER MENU
 :: -------------------------------------------------------------
@@ -67,26 +70,37 @@ echo ===================================================================
 echo.
 echo   [1] Play Game (Standalone Windows Executable)
 echo   [2] Play Game (Direct Godot Engine Mode)
-echo   [3] Run Automated QA Test Suite (Headless - 80 Tests)
-echo   [4] Rebuild Release Packages (Windows ^& Android PCKs)
-echo   [5] Regenerate Refined Sprites ^& Audio Assets (Python)
-echo   [6] Launch Project in Godot 4 Editor
-echo   [7] Sync ^& Push Latest Code to GitHub
-echo   [8] Exit
+echo   [3] Play Game (Web Browser - GitHub Pages Mode)
+echo   [4] Run Automated QA Test Suite (Headless - 107 Tests)
+echo   [5] Rebuild Release Packages (Windows ^& Android PCKs)
+echo   [6] Regenerate Refined Sprites, Audio ^& Preview Banner
+echo   [7] Launch Project in Godot 4 Editor
+echo   [8] Sync ^& Push Latest Code to GitHub
+echo   [9] Exit
 echo.
 echo ===================================================================
-choice /c 12345678 /t 6 /d 1 /m "Select option (Auto-launches [1] in 6s):"
+choice /c 123456789 /t 6 /d 1 /m "Select option (Auto-launches [1] in 6s):"
 set "OPT=%ERRORLEVEL%"
 
 if "%OPT%"=="1" goto :play_standalone
 if "%OPT%"=="2" goto :play_engine
-if "%OPT%"=="3" goto :run_tests
-if "%OPT%"=="4" goto :export_packages
-if "%OPT%"=="5" goto :regenerate_assets
-if "%OPT%"=="6" goto :launch_editor
-if "%OPT%"=="7" goto :git_push
-if "%OPT%"=="8" goto :eof
+if "%OPT%"=="3" goto :play_web
+if "%OPT%"=="4" goto :run_tests
+if "%OPT%"=="5" goto :export_packages
+if "%OPT%"=="6" goto :regenerate_assets
+if "%OPT%"=="7" goto :launch_editor
+if "%OPT%"=="8" goto :git_push
+if "%OPT%"=="9" goto :eof
 goto :menu
+
+:: -------------------------------------------------------------
+:: OPTION 3: PLAY IN WEB BROWSER
+:: -------------------------------------------------------------
+:play_web
+echo.
+echo [1/1] Launching Ramgarh Escape in your default web browser...
+start "" "%~dp0index.html"
+exit /b 0
 
 :: -------------------------------------------------------------
 :: OPTION 1: PLAY STANDALONE EXECUTABLE
@@ -181,14 +195,16 @@ echo ===================================================================
 echo        REGENERATING REFINED CHARACTER SPRITES & AUDIO
 echo ===================================================================
 cd /d "%~dp0"
-echo [1/4] Generating refined Jai & Veeru sprites with BSA Motorbike...
+echo [1/5] Generating refined Jai & Veeru sprites with BSA Motorbike...
 python tools\generate_refined_player.py
-echo [2/4] Generating Basanti sprites, Dhanno tanga, and dialogue avatars...
+echo [2/5] Generating Basanti sprites, Dhanno tanga, and dialogue avatars...
 python tools\generate_girls_and_portraits.py
-echo [3/4] Generating Bollywood soundtracks, songs, and dialogue voice FX...
+echo [3/5] Generating Bollywood soundtracks, songs, and dialogue voice FX...
 python tools\generate_bollywood_music.py
-echo [4/4] Generating core background layers, obstacles, and UI assets...
+echo [4/5] Generating core background layers, obstacles, and UI assets...
 python tools\generate_all_assets.py
+echo [5/5] Generating 1200x630 social preview banner (preview.png)...
+python tools\generate_preview_banner.py
 echo.
 echo All assets regenerated successfully!
 if "!IS_CLI!"=="1" exit /b %ERRORLEVEL%
