@@ -200,7 +200,7 @@ echo [1/3] Exporting Windows Desktop Package (build\windows\RamgarhEscape.pck)..
 echo [2/3] Exporting Android APK (build\android\RamgarhEscape.apk)...
 "!GODOT_CONSOLE!" --headless --path "%~dp0." --export-debug Android "%~dp0build\android\RamgarhEscape.apk"
 
-echo [3/3] Injecting Official Game Logo Icons & Signing APK...
+echo [3/3] Injecting Official Game Logo Icons ^& Signing APK...
 python "%~dp0tools\inject_apk_icons.py"
 
 echo.
@@ -208,7 +208,7 @@ echo ===================================================================
 echo [SUCCESS] Android APK with Game Logo created at:
 echo   %~dp0build\android\RamgarhEscape.apk
 echo ===================================================================
-explorer.exe /select,"%~dp0build\android\RamgarhEscape.apk"
+start "" "%~dp0build\android"
 if "!IS_CLI!"=="1" exit /b %ERRORLEVEL%
 pause
 goto :menu

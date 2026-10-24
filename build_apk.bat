@@ -36,22 +36,23 @@ if not exist "%~dp0build\android\RamgarhEscape.apk" (
 )
 
 echo.
-echo [2/3] Injecting Official Game Logo Icons & Adaptive Mipmaps...
+echo [2/3] Injecting Official Game Logo Icons ^& Adaptive Mipmaps...
 python "%~dp0tools\inject_apk_icons.py"
 
 echo.
-echo [3/3] Build & Verification Complete!
+echo [3/3] Build ^& Verification Complete!
 echo.
 echo ===================================================================
 echo   APK File Location:
 echo   %~dp0build\android\RamgarhEscape.apk
 echo.
 echo   - App Icon: Official Ramgarh Escape Golden Crest with Veeru
-echo   - Status: Signed & Verified with debug.keystore
+echo   - Status: Signed ^& Verified with debug.keystore
 echo ===================================================================
 echo.
-echo Opening folder so you can share it directly...
-explorer.exe /select,"%~dp0build\android\RamgarhEscape.apk"
-
-if not "%~1"=="--no-pause" pause
+if not "%~1"=="--no-pause" (
+    echo Opening folder so you can share it directly...
+    start "" "%~dp0build\android"
+    pause
+)
 exit /b 0
