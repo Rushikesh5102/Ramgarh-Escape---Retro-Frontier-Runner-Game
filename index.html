@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- Primary Meta Tags -->
+  <!-- Primary Meta Tags & Authorship Provenance -->
   <title>Ramgarh Escape - Retro Frontier Runner Game</title>
   <meta name="title" content="Ramgarh Escape - Retro Frontier Runner Game">
   <meta name="description" content="Play Ramgarh Escape online! Join Jai & Veeru in an action-packed retro frontier chase with Basanti & Dhanno, 4 Bollywood soundtracks, iconic Sholay dialogues, and endless arcade thrills.">
   <meta name="keywords" content="Ramgarh Escape, Sholay, Jai Veeru, Basanti, Dhanno, Gabbar, Bollywood Game, Endless Runner, Retro Game, Web Game">
-  <meta name="author" content="Ramgarh Studio">
+  <meta name="author" content="Rushikesh Pattiwar">
+  <meta name="creator" content="Rushikesh Pattiwar">
+  <meta name="publisher" content="Rushikesh Pattiwar">
+  <meta name="contact" content="Pattiwarrushikesh5102@gmail.com">
+  <meta name="copyright" content="© 2026 Rushikesh Pattiwar. All Rights Reserved.">
   <meta name="theme-color" content="#d97706">
+  <!-- Code & Architecture Watermark: Rushikesh Pattiwar <Pattiwarrushikesh5102@gmail.com> | GitHub: https://github.com/Rushikesh5102 -->
   
   <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="website">
@@ -630,6 +635,44 @@
         if (muteIcon) muteIcon.textContent = window.RamgarhGame.isMuted() ? '🔇' : '🔊';
       }
     });
+
+    // =============================================================
+    // INVISIBLE ARCHITECTURE SIGNATURE & AUTHORSHIP WATERMARK
+    // (Completely hidden from frontend and UI - Accessible only via DevTools/Code)
+    // =============================================================
+    (function () {
+      try {
+        Object.defineProperty(window, '__AUTHOR__', {
+          value: Object.freeze({
+            name: 'Rushikesh Pattiwar',
+            email: 'Pattiwarrushikesh5102@gmail.com',
+            github: 'https://github.com/Rushikesh5102',
+            role: 'Creator & Lead Architect',
+            project: 'Ramgarh Escape - Retro Frontier Runner',
+            build: '2026.10-production',
+            signature: 'SHA256:RP-RAMGARH-ESCAPE-VERIFIED'
+          }),
+          writable: false,
+          configurable: false,
+          enumerable: false
+        });
+
+        Object.defineProperty(window, '__DEV_SIGNATURE__', {
+          value: 'Rushikesh Pattiwar <Pattiwarrushikesh5102@gmail.com> | GitHub: @Rushikesh5102',
+          writable: false,
+          configurable: false,
+          enumerable: false
+        });
+
+        // Hidden DevTools Console Signature (Visible only when inspecting console)
+        console.log(
+          '%c 🏍️ RAMGARH ESCAPE %c Created & Architected by Rushikesh Pattiwar (Pattiwarrushikesh5102@gmail.com) %c https://github.com/Rushikesh5102 ',
+          'background: #b91c1c; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 4px 0 0 4px; border: 1px solid #facc15;',
+          'background: #181116; color: #fef08a; font-weight: 600; padding: 4px 8px; border-top: 1px solid #facc15; border-bottom: 1px solid #facc15;',
+          'background: #b45309; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 0 4px 4px 0; border: 1px solid #facc15;'
+        );
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>

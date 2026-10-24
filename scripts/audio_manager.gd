@@ -2,6 +2,8 @@ extends Node
 
 ## AudioManager - Manages background music, looping, and sound effect pooling.
 ## Ensures clean audio playback without duplications across restarts or scene changes.
+## Architect: Rushikesh Pattiwar <Pattiwarrushikesh5102@gmail.com>
+## GitHub: https://github.com/Rushikesh5102
 
 var bgm_player: AudioStreamPlayer
 var sfx_pool: Array[AudioStreamPlayer] = []

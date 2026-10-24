@@ -7,7 +7,8 @@ config_version=5
 [application]
 
 config/name="Ramgarh Escape"
-config/description="2D endless runner adventure inspired by retro frontier comedies."
+config/description="2D endless retro frontier runner by Rushikesh Pattiwar."
+config/author="Rushikesh Pattiwar"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://assets/sprites/icon.svg"

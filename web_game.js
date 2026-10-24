@@ -1,8 +1,13 @@
 /**
  * Ramgarh Escape - Web Game Engine (HTML5 Canvas & Web Audio API)
  * Mastercrafted Retro Frontier Runner with High-DPI Rendering,
- * Real-Time Bollywood Web Audio Music & SFX Synthesizer + Studio WAV Streaming,
+ * Real-Time Bollywood Web Audio Music & SFX Synthesizer + Studio Audio Streaming,
  * Responsive Double-Jump Physics, and High-Fidelity Character Art.
+ *
+ * @author Rushikesh Pattiwar <Pattiwarrushikesh5102@gmail.com>
+ * @copyright (c) 2026 Rushikesh Pattiwar. All Rights Reserved.
+ * @repository https://github.com/Rushikesh5102/Ramgarh-Escape---Retro-Frontier-Runner-Game
+ * @signature Rushikesh Pattiwar [rushikesh5102]
  */
 
 (function () {
@@ -1760,7 +1765,13 @@
     },
     getState() {
       return gameState;
-    }
+    },
+    author: Object.freeze({
+      name: 'Rushikesh Pattiwar',
+      email: 'Pattiwarrushikesh5102@gmail.com',
+      github: 'https://github.com/Rushikesh5102',
+      project: 'Ramgarh Escape'
+    })
   };
 
   // Kickoff game loop

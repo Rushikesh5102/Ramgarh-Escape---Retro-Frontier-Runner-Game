@@ -2,6 +2,8 @@ extends Node
 
 ## GameManager - Core game state machine, score progression,
 ## difficulty scaling, and "Dhanno Rush / Basanti Fever" super boost mode.
+## Architect: Rushikesh Pattiwar <Pattiwarrushikesh5102@gmail.com>
+## GitHub: https://github.com/Rushikesh5102
 
 enum State {
 	MENU,

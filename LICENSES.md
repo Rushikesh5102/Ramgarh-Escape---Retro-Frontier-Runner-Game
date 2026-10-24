@@ -1,6 +1,8 @@
 # Asset Licenses and Intellectual Property Documentation
 
 **Project:** Ramgarh Escape  
+**Author & Creator:** Rushikesh Pattiwar (Pattiwarrushikesh5102@gmail.com)  
+**GitHub:** https://github.com/Rushikesh5102  
 **License:** MIT License  
 **Budget:** ₹0  
 **Online Connectivity:** 100% Offline  
