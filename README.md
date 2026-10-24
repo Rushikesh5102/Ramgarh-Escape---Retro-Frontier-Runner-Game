@@ -176,7 +176,11 @@ Ramgarh Escape/
 │   │   ├── RamgarhEscape.exe    # Standalone Windows desktop executable
 │   │   └── RamgarhEscape.pck    # Packed project bundle
 │   └── android/
+│       ├── RamgarhEscape.apk    # Signed, standalone Android APK for mobile
 │       └── RamgarhEscape.pck    # Android project bundle
+│
+├── build_apk.bat                # 1-Click Android APK builder & auto-signer
+├── run_game.bat                 # Unified launcher & command center
 │
 ├── tests/
 │   ├── test_runner.tscn         # Automated unit test suite runner

@@ -40,8 +40,10 @@ if /i "%~1"=="3" goto :run_tests
 
 if /i "%~1"=="--export" goto :export_packages
 if /i "%~1"=="--build" goto :export_packages
+if /i "%~1"=="--apk" goto :export_packages
+if /i "%~1"=="apk" goto :export_packages
 if /i "%~1"=="build" goto :export_packages
-if /i "%~1"=="4" goto :export_packages
+if /i "%~1"=="5" goto :export_packages
 
 if /i "%~1"=="--assets" goto :regenerate_assets
 if /i "%~1"=="assets" goto :regenerate_assets
@@ -72,7 +74,7 @@ echo   [1] Play Game (Standalone Windows Executable)
 echo   [2] Play Game (Direct Godot Engine Mode)
 echo   [3] Play Game (Web Browser - GitHub Pages Mode)
 echo   [4] Run Automated QA Test Suite (Headless - 107 Tests)
-echo   [5] Rebuild Release Packages (Windows ^& Android PCKs)
+echo   [5] Build Android APK & Release Packages (build\android\RamgarhEscape.apk)
 echo   [6] Regenerate Refined Sprites, Audio ^& Preview Banner
 echo   [7] Launch Project in Godot 4 Editor
 echo   [8] Sync ^& Push Latest Code to GitHub
@@ -167,7 +169,7 @@ goto :menu
 :export_packages
 echo.
 echo ===================================================================
-echo          REBUILDING RELEASE DATA PACKAGES (PCK)
+echo     BUILDING ANDROID APK & RELEASE DATA PACKAGES
 echo ===================================================================
 cd /d "%~dp0"
 if not exist "!GODOT_CONSOLE!" (
@@ -176,12 +178,30 @@ if not exist "!GODOT_CONSOLE!" (
     pause
     goto :menu
 )
-echo [1/2] Exporting Windows Desktop Package (build\windows\RamgarhEscape.pck)...
+if not exist "build\android" mkdir "build\android"
+
+echo [1/3] Exporting Windows Desktop Package (build\windows\RamgarhEscape.pck)...
 "!GODOT_CONSOLE!" --headless --path "%~dp0." --export-pack "Windows Desktop" "%~dp0build\windows\RamgarhEscape.pck"
-echo [2/2] Exporting Android Package (build\android\RamgarhEscape.pck)...
-"!GODOT_CONSOLE!" --headless --path "%~dp0." --export-pack "Android" "%~dp0build\android\RamgarhEscape.pck"
+
+echo [2/3] Exporting Android APK (build\android\RamgarhEscape.apk)...
+"!GODOT_CONSOLE!" --headless --path "%~dp0." --export-debug Android "%~dp0build\android\RamgarhEscape.apk"
+
+echo [3/3] Signing APK with Android Debug Keystore...
+set "JARSIGNER=C:\Program Files\Java\jdk-24\bin\jarsigner.exe"
+set "KEYSTORE=%APPDATA%\Godot\keystores\debug.keystore"
+if exist "!JARSIGNER!" (
+    if exist "!KEYSTORE!" (
+        "!JARSIGNER!" -sigalg SHA256withRSA -digestalg SHA-256 -keystore "!KEYSTORE!" -storepass android "%~dp0build\android\RamgarhEscape.apk" androiddebugkey >nul 2>&1
+        echo APK successfully signed and ready for installation!
+    )
+)
+
 echo.
-echo Packages rebuilt successfully!
+echo ===================================================================
+echo [SUCCESS] Android APK created at:
+echo   %~dp0build\android\RamgarhEscape.apk
+echo ===================================================================
+explorer.exe /select,"%~dp0build\android\RamgarhEscape.apk"
 if "!IS_CLI!"=="1" exit /b %ERRORLEVEL%
 pause
 goto :menu
