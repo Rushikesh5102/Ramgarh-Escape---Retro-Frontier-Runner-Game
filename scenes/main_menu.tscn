@@ -1,0 +1,163 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_mountains.png" id="3_mtn"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_midground.png" id="4_mid"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_road.png" id="5_road"]
+[ext_resource type="Texture2D" path="res://assets/ui/logo.png" id="6_logo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player_run_0.png" id="7_bike"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particle_dust.png" id="8_dust"]
+[ext_resource type="FontFile" path="res://assets/fonts/title_font.ttf" id="9_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/ui_font.ttf" id="10_ui_font"]
+[ext_resource type="PackedScene" path="res://scenes/settings_menu.tscn" id="11_settings"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+bg_color = Color(0.12, 0.08, 0.1, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.75, 0.3, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 16.0
+expand_margin_top = 10.0
+expand_margin_right = 16.0
+expand_margin_bottom = 10.0
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Sky" type="Sprite2D" parent="Background"]
+position = Vector2(576, 324)
+texture = ExtResource("2_sky")
+
+[node name="Mountains" type="Sprite2D" parent="Background"]
+position = Vector2(576, 324)
+texture = ExtResource("3_mtn")
+
+[node name="Midground" type="Sprite2D" parent="Background"]
+position = Vector2(576, 324)
+texture = ExtResource("4_mid")
+
+[node name="Road" type="Sprite2D" parent="Background"]
+position = Vector2(576, 548)
+texture = ExtResource("5_road")
+
+[node name="BikePreview" type="Sprite2D" parent="."]
+position = Vector2(250, 480)
+texture = ExtResource("7_bike")
+
+[node name="DustParticles" type="CPUParticles2D" parent="BikePreview"]
+position = Vector2(-48, 44)
+amount = 8
+lifetime = 0.35
+texture = ExtResource("8_dust")
+emission_shape = 3
+emission_rect_extents = Vector2(10, 2)
+direction = Vector2(-1, -0.2)
+spread = 25.0
+gravity = Vector2(0, 40)
+initial_velocity_min = 60.0
+initial_velocity_max = 120.0
+scale_amount_min = 0.3
+scale_amount_max = 0.6
+color = Color(0.9, 0.75, 0.55, 0.75)
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -270.0
+offset_right = 300.0
+offset_bottom = 270.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Logo" type="TextureRect" parent="UI/MainVBox"]
+custom_minimum_size = Vector2(540, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("6_logo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RecordBox" type="PanelContainer" parent="UI/MainVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBox" type="VBoxContainer" parent="UI/MainVBox/RecordBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BestScoreLabel" type="Label" parent="UI/MainVBox/RecordBox/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+text = "High Score: 0 pts  |  Best Run: 0 m"
+horizontal_alignment = 1
+
+[node name="TotalCoinsLabel" type="Label" parent="UI/MainVBox/RecordBox/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+text = "Total Coins: 0"
+horizontal_alignment = 1
+
+[node name="ButtonBox" type="VBoxContainer" parent="UI/MainVBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 12
+
+[node name="PlayBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_title_font")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+text = "PLAY ESCAPE"
+
+[node name="SettingsBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_font_sizes/font_size = 20
+text = "SETTINGS"
+
+[node name="QuitBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_font_sizes/font_size = 20
+text = "QUIT"
+
+[node name="SettingsMenu" parent="." instance=ExtResource("11_settings")]

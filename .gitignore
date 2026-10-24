@@ -1,0 +1,17 @@
+# Godot 4+ specific ignores
+.godot/
+
+# Build binaries & large export artifacts (>100MB exceeds GitHub push limits)
+build/
+bin/
+*.exe
+*.apk
+*.aab
+
+# Logs & temp files
+godot_*_log.txt
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,87 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/parallax_bg.gd" id="1_para"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_mountains.png" id="3_mtn"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_midground.png" id="4_mid"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_road.png" id="5_road"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="6_player"]
+[ext_resource type="Script" path="res://scripts/obstacle_spawner.gd" id="7_spawner"]
+[ext_resource type="Script" path="res://scripts/dialogue_system.gd" id="8_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="9_hud"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="10_pause"]
+[ext_resource type="PackedScene" path="res://scenes/game_over.tscn" id="11_game_over"]
+[ext_resource type="PackedScene" path="res://scenes/settings_menu.tscn" id="12_settings"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(2400, 100)
+
+[node name="Main" type="Node2D"]
+
+[node name="ParallaxBg" type="Node2D" parent="."]
+script = ExtResource("1_para")
+
+[node name="Sky" type="Node2D" parent="ParallaxBg"]
+
+[node name="Sprite1" type="Sprite2D" parent="ParallaxBg/Sky"]
+position = Vector2(576, 324)
+texture = ExtResource("2_sky")
+
+[node name="Sprite2" type="Sprite2D" parent="ParallaxBg/Sky"]
+position = Vector2(1856, 324)
+texture = ExtResource("2_sky")
+
+[node name="Mountains" type="Node2D" parent="ParallaxBg"]
+
+[node name="Sprite1" type="Sprite2D" parent="ParallaxBg/Mountains"]
+position = Vector2(576, 324)
+texture = ExtResource("3_mtn")
+
+[node name="Sprite2" type="Sprite2D" parent="ParallaxBg/Mountains"]
+position = Vector2(1856, 324)
+texture = ExtResource("3_mtn")
+
+[node name="Midground" type="Node2D" parent="ParallaxBg"]
+
+[node name="Sprite1" type="Sprite2D" parent="ParallaxBg/Midground"]
+position = Vector2(576, 324)
+texture = ExtResource("4_mid")
+
+[node name="Sprite2" type="Sprite2D" parent="ParallaxBg/Midground"]
+position = Vector2(1856, 324)
+texture = ExtResource("4_mid")
+
+[node name="Road" type="Node2D" parent="ParallaxBg"]
+
+[node name="Sprite1" type="Sprite2D" parent="ParallaxBg/Road"]
+position = Vector2(576, 548)
+texture = ExtResource("5_road")
+
+[node name="Sprite2" type="Sprite2D" parent="ParallaxBg/Road"]
+position = Vector2(1856, 548)
+texture = ExtResource("5_road")
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(576, 520)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="Player" parent="." instance=ExtResource("6_player")]
+position = Vector2(220, 420)
+
+[node name="ObstacleSpawner" type="Node2D" parent="."]
+script = ExtResource("7_spawner")
+
+[node name="DialogueSystem" type="Node" parent="."]
+script = ExtResource("8_dialogue")
+
+[node name="HUD" parent="." instance=ExtResource("9_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
+
+[node name="GameOver" parent="." instance=ExtResource("11_game_over")]
+
+[node name="SettingsMenu" parent="." instance=ExtResource("12_settings")]

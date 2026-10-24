@@ -1,0 +1,133 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/settings_menu.gd" id="1_settings"]
+[ext_resource type="FontFile" path="res://assets/fonts/title_font.ttf" id="2_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/ui_font.ttf" id="3_ui_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.08, 0.12, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.75, 0.3, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 24.0
+expand_margin_top = 20.0
+expand_margin_right = 24.0
+expand_margin_bottom = 20.0
+
+[node name="SettingsMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 15
+script = ExtResource("1_settings")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -240.0
+offset_right = 260.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 38
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+text = "AUDIO & CONTROLS"
+horizontal_alignment = 1
+
+[node name="AudioGrid" type="GridContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="MusicLabel" type="Label" parent="Panel/VBox/AudioGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+text = "Music Volume:"
+
+[node name="MusicSlider" type="HSlider" parent="Panel/VBox/AudioGrid"]
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 80.0
+
+[node name="SfxLabel" type="Label" parent="Panel/VBox/AudioGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+text = "Sound Effects:"
+
+[node name="SfxSlider" type="HSlider" parent="Panel/VBox/AudioGrid"]
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 90.0
+
+[node name="MuteLabel" type="Label" parent="Panel/VBox/AudioGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+text = "Mute All Audio:"
+
+[node name="MuteCheck" type="CheckBox" parent="Panel/VBox/AudioGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBox"]
+layout_mode = 2
+
+[node name="ControlsTitle" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.75, 0.35, 1)
+text = "HOW TO PLAY"
+
+[node name="ControlsGuide" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "• MOBILE: Tap screen anywhere to Jump!
+• DESKTOP: Space / Up Arrow / W to Jump.
+• PAUSE: Touch Pause button or press Esc / P."
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+text = "BACK"

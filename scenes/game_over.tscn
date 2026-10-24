@@ -1,0 +1,158 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_over.gd" id="1_game_over"]
+[ext_resource type="FontFile" path="res://assets/fonts/title_font.ttf" id="2_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/ui_font.ttf" id="3_ui_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.14, 0.08, 0.1, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.4, 0.25, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 24.0
+expand_margin_top = 20.0
+expand_margin_right = 24.0
+expand_margin_bottom = 20.0
+
+[node name="GameOver" type="CanvasLayer"]
+process_mode = 3
+layer = 12
+script = ExtResource("1_game_over")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.02, 0.04, 0.72)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="PanelContainer/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 42
+theme_override_colors/font_color = Color(1, 0.35, 0.25, 1)
+text = "CHALAN HO GAYA!"
+horizontal_alignment = 1
+
+[node name="NewRecordLabel" type="Label" parent="PanelContainer/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
+text = "★ NEW RECORD! ★"
+horizontal_alignment = 1
+
+[node name="StatsGrid" type="GridContainer" parent="PanelContainer/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="DistanceLabel" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+text = "Distance Run:"
+
+[node name="DistanceVal" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+text = "0 m"
+horizontal_alignment = 2
+
+[node name="CoinsLabel" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+text = "Coins Collected:"
+
+[node name="CoinsVal" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+text = "0"
+horizontal_alignment = 2
+
+[node name="TotalLabel" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+text = "Total Score:"
+
+[node name="TotalVal" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.3, 1, 0.45, 1)
+text = "0 pts"
+horizontal_alignment = 2
+
+[node name="BestLabel" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+text = "Best Record:"
+
+[node name="BestVal" type="Label" parent="PanelContainer/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+text = "0 pts"
+horizontal_alignment = 2
+
+[node name="Spacer" type="Control" parent="PanelContainer/VBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="BtnBox" type="HBoxContainer" parent="PanelContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="RetryBtn" type="Button" parent="PanelContainer/VBox/BtnBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+text = "PLAY AGAIN"
+
+[node name="MenuBtn" type="Button" parent="PanelContainer/VBox/BtnBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_ui_font")
+theme_override_font_sizes/font_size = 22
+text = "MAIN MENU"
