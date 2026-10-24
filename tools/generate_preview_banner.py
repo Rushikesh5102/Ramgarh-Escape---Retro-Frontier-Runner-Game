@@ -1,164 +1,156 @@
 """
-generate_preview_banner.py
-Generates the official 1200x630 OpenGraph / Twitter Card preview banner ('preview.png')
-for GitHub Pages social sharing (WhatsApp, Twitter/X, Discord, LinkedIn, Telegram, iMessage).
+tools/generate_preview_banner.py
+Generates the official 1200x630 OpenGraph / WhatsApp / Twitter Card preview banner ('preview.png' and 'preview.jpg')
+for GitHub Pages social sharing. Strictly optimized to stay < 300 KB for WhatsApp's large card preview requirement.
 """
-import math
 import os
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import shutil
+from PIL import Image, ImageDraw, ImageFont
 
 def generate_preview():
-    width = 1200
-    height = 630
-    img = Image.new("RGBA", (width, height), (0, 0, 0, 255))
-    d = ImageDraw.Draw(img)
+    source_art = r"C:\Users\Rushi\.gemini\antigravity-ide\brain\818994d6-3f81-4718-8b2e-328c2fcc4358\ramgarh_social_banner_1792849516331.jpg"
+    target_w, target_h = 1200, 630
     
-    # 1. Dramatic Sunset Desert Sky Gradient (Deep Indigo -> Crimson -> Tangerine -> Golden Amber)
-    for y in range(height):
-        r_ratio = y / float(height)
-        if r_ratio < 0.35:
-            # Deep twilight to fiery crimson
-            sub = r_ratio / 0.35
-            r = int(45 + sub * 155)
-            g = int(20 + sub * 40)
-            b = int(55 + sub * 25)
-        elif r_ratio < 0.70:
-            # Fiery crimson to radiant sunset amber
-            sub = (r_ratio - 0.35) / 0.35
-            r = int(200 + sub * 50)
-            g = int(60 + sub * 115)
-            b = int(80 - sub * 40)
+    if os.path.exists(source_art):
+        base = Image.open(source_art).convert("RGBA")
+        sw, sh = base.size
+        target_ratio = target_w / float(target_h)
+        cur_ratio = sw / float(sh)
+        
+        if cur_ratio > target_ratio:
+            new_sw = int(sh * target_ratio)
+            crop_x = (sw - new_sw) // 2
+            base = base.crop((crop_x, 0, crop_x + new_sw, sh))
         else:
-            # Amber to desert dusk
-            sub = (r_ratio - 0.70) / 0.30
-            r = int(250 - sub * 70)
-            g = int(175 - sub * 75)
-            b = int(40 - sub * 10)
-        d.line([(0, y), (width, y)], fill=(r, g, b, 255))
-        
-    # 2. Giant Glowing Golden Sun on Horizon
-    sun_x, sun_y, sun_r = 600, 310, 140
-    for r in range(sun_r + 80, 0, -2):
-        alpha = int(max(0, min(140, (1.0 - (r / (sun_r + 80))) * 180)))
-        d.ellipse([sun_x - r, sun_y - r, sun_x + r, sun_y + r], fill=(255, 220, 100, alpha))
-    d.ellipse([sun_x - sun_r, sun_y - sun_r, sun_x + sun_r, sun_y + sun_r], fill=(255, 245, 180, 255))
-    
-    # 3. Silhouetted Ramgarh Mountain Ridges (Layer 1 & 2)
-    # Distant peaks
-    mtn_far = [(0, 360)]
-    for x in range(0, width + 50, 40):
-        py = 310 + math.sin(x * 0.008) * 45 + math.cos(x * 0.02) * 25
-        mtn_far.append((x, py))
-    mtn_far.extend([(width, height), (0, height)])
-    d.polygon(mtn_far, fill=(120, 45, 55, 230))
-    
-    # Closer rugged Ramgarh rock cliffs
-    mtn_near = [(0, 420)]
-    for x in range(0, width + 40, 30):
-        py = 370 + math.sin(x * 0.012 + 1.2) * 55 + math.sin(x * 0.035) * 20
-        mtn_near.append((x, py))
-    mtn_near.extend([(width, height), (0, height)])
-    d.polygon(mtn_near, fill=(80, 30, 40, 255))
-    
-    # 4. Highway Desert Road
-    road_poly = [(0, 480), (width, 480), (width, height), (0, height)]
-    d.polygon(road_poly, fill=(50, 42, 45, 255))
-    d.line([(0, 480), (width, 480)], fill=(217, 119, 6, 255), width=6) # Golden curb
-    # Road dashed centerline
-    for rx in range(0, width, 80):
-        d.line([(rx, 550), (rx + 45, 550)], fill=(250, 204, 21, 200), width=6)
-        
-    # 5. Paste or Draw Basanti & Dhanno Tanga on the Right Side
-    tanga_path = "assets/sprites/basanti_dhanno_tanga_0.png"
-    if os.path.exists(tanga_path):
-        tanga_img = Image.open(tanga_path).convert("RGBA")
-        # Upscale for social banner
-        tanga_scaled = tanga_img.resize((360, 234), Image.Resampling.LANCZOS)
-        img.paste(tanga_scaled, (760, 370), tanga_scaled)
-        
-    # 6. Paste or Draw Jai & Veeru on the BSA Motorbike on the Left Side
-    bike_path = "assets/sprites/player_run_0.png"
-    if os.path.exists(bike_path):
-        bike_img = Image.open(bike_path).convert("RGBA")
-        bike_scaled = bike_img.resize((360, 240), Image.Resampling.LANCZOS)
-        img.paste(bike_scaled, (80, 365), bike_scaled)
-        
-    # 7. Sparkling Golden Jhumkas & Coins Floating
-    jhumka_path = "assets/sprites/collectible_jhumka.png"
-    if os.path.exists(jhumka_path):
-        jh_img = Image.open(jhumka_path).convert("RGBA").resize((64, 64), Image.Resampling.LANCZOS)
-        img.paste(jh_img, (720, 280), jh_img)
-        img.paste(jh_img, (440, 320), jh_img)
-        
-    coin_path = "assets/ui/icon_coin.png"
-    if os.path.exists(coin_path):
-        coin_img = Image.open(coin_path).convert("RGBA").resize((48, 48), Image.Resampling.LANCZOS)
-        img.paste(coin_img, (380, 260), coin_img)
-        img.paste(coin_img, (780, 230), coin_img)
-        
-    # 8. Character Avatars in Circular Medallions (Basanti, Jai, Veeru, Gabbar)
-    avatar_names = ["avatar_basanti.png", "avatar_veeru.png", "avatar_jai.png", "avatar_gabbar.png"]
-    av_start_x = 450
-    for idx, av_name in enumerate(avatar_names):
-        av_path = os.path.join("assets/sprites", av_name)
-        if os.path.exists(av_path):
-            av_img = Image.open(av_path).convert("RGBA").resize((60, 60), Image.Resampling.LANCZOS)
-            img.paste(av_img, (av_start_x + idx * 75, 490), av_img)
+            new_sh = int(sw / target_ratio)
+            crop_y = (sh - new_sh) // 2
+            base = base.crop((0, crop_y, sw, crop_y + new_sh))
             
-    # 9. Main Title & Logo Banner (Centered Top)
-    logo_path = "assets/ui/logo.png"
-    if os.path.exists(logo_path):
-        logo_img = Image.open(logo_path).convert("RGBA")
-        logo_scaled = logo_img.resize((620, 180), Image.Resampling.LANCZOS)
-        img.paste(logo_scaled, (290, 40), logo_scaled)
+        banner = base.resize((target_w, target_h), Image.Resampling.LANCZOS)
     else:
-        # Fallback Title Box
-        d.rounded_rectangle([250, 50, 950, 200], radius=16, fill=(20, 15, 20, 220), outline=(250, 204, 21, 255), width=4)
+        banner = Image.new("RGBA", (target_w, target_h), (25, 15, 20, 255))
         
-    # 10. Taglines & Feature Badges
-    # Subtitle Badge
-    d.rounded_rectangle([280, 215, 920, 260], radius=12, fill=(18, 12, 18, 230), outline=(245, 158, 11, 255), width=2)
+    overlay = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(overlay)
     
-    # Try loading custom font, else fallback
-    font_large = None
-    font_small = None
-    for fpath in ["assets/fonts/title_font.ttf", "assets/fonts/ui_font.ttf"]:
-        if os.path.exists(fpath):
+    # Fonts
+    font_pill = None
+    font_bold = None
+    font_badge = None
+    
+    for font_cand in [
+        "C:\\Windows\\Fonts\\segoeuib.ttf",
+        "C:\\Windows\\Fonts\\arialbd.ttf",
+        "assets/fonts/title_font.ttf"
+    ]:
+        if os.path.exists(font_cand):
             try:
-                font_large = ImageFont.truetype(fpath, 22)
-                font_small = ImageFont.truetype(fpath, 16)
+                font_pill = ImageFont.truetype(font_cand, 14)
+                font_bold = ImageFont.truetype(font_cand, 20)
+                font_badge = ImageFont.truetype(font_cand, 12)
                 break
             except:
                 pass
                 
-    text_sub = "THE RETRO BOLLYWOOD FRONTIER RUNNER"
-    if font_large:
-        d.text((320, 225), text_sub, fill=(255, 235, 160, 255), font=font_large)
-    else:
-        d.text((360, 228), text_sub, fill=(255, 235, 160, 255))
-        
-    # Feature Badges Pill (Bottom bar)
-    d.rounded_rectangle([150, 575, 1050, 615], radius=10, fill=(15, 10, 15, 240), outline=(250, 204, 21, 255), width=2)
-    features_text = "🎵 4 BOLLYWOOD SOUNDTRACKS   ★   BASANTI & DHANNO RUSH   ★   ICONIC SHOLAY BANTER   ★   PLAY FREE IN BROWSER"
-    if font_small:
-        d.text((180, 586), features_text, fill=(254, 240, 138, 255), font=font_small)
-    else:
-        d.text((180, 586), features_text, fill=(254, 240, 138, 255))
-        
-    # Play CTA Badge
-    d.rounded_rectangle([510, 280, 690, 325], radius=22, fill=(220, 38, 38, 255), outline=(254, 240, 138, 255), width=3)
-    d.polygon([(545, 292), (545, 314), (565, 303)], fill=(255, 255, 255, 255))
-    if font_small:
-        d.text((580, 294), "PLAY NOW", fill=(255, 255, 255, 255), font=font_small)
-    else:
-        d.text((580, 294), "PLAY NOW", fill=(255, 255, 255, 255))
-        
-    img.save("preview.png", "PNG")
-    print("Generated preview.png (1200x630)")
+    if font_pill is None:
+        font_pill = font_bold = font_badge = ImageFont.load_default()
+
+    # 1. Subtle top golden border accent line
+    d.line([(0, 0), (target_w, 0)], fill=(234, 179, 8, 255), width=4)
     
-    # Also save inside assets/ui/preview.png
-    img.save("assets/ui/preview.png", "PNG")
-    print("Generated assets/ui/preview.png")
+    # 2. Solid Bottom Feature Dashboard (y = 518 to 630)
+    dash_top = 518
+    for y in range(dash_top, target_h):
+        sub_ratio = (y - dash_top) / float(target_h - dash_top)
+        r = int(14 + sub_ratio * 12)
+        g = int(10 + sub_ratio * 8)
+        b = int(16 + sub_ratio * 10)
+        d.line([(0, y), (target_w, y)], fill=(r, g, b, 255))
+        
+    # Polished multi-line golden divider on top of the dashboard
+    d.line([(0, dash_top), (target_w, dash_top)], fill=(250, 204, 21, 255), width=3)
+    d.line([(0, dash_top + 3), (target_w, dash_top + 3)], fill=(180, 83, 9, 200), width=1)
+    
+    # 3. Left Section: 4 High-Definition Golden Character Medallions
+    avatar_list = [
+        ("avatar_veeru.png", "VEERU"),
+        ("avatar_jai.png", "JAI"),
+        ("avatar_basanti.png", "BASANTI"),
+        ("avatar_gabbar.png", "GABBAR")
+    ]
+    
+    av_x = 24
+    av_y = 528
+    av_size = 58
+    
+    for av_name, label in avatar_list:
+        av_path = os.path.join("assets/sprites", av_name)
+        if os.path.exists(av_path):
+            av_img = Image.open(av_path).convert("RGBA").resize((av_size, av_size), Image.Resampling.LANCZOS)
+            overlay.paste(av_img, (av_x, av_y), av_img)
+            
+            bbox = d.textbbox((0, 0), label, font=font_badge)
+            tw = bbox[2] - bbox[0]
+            label_x = av_x + (av_size - tw) // 2
+            d.text((label_x, av_y + 60), label, fill=(254, 240, 138, 255), font=font_badge)
+            av_x += 76
+            
+    # Vertical golden separator
+    d.line([(av_x + 8, dash_top + 10), (av_x + 8, target_h - 10)], fill=(234, 179, 8, 140), width=2)
+    
+    # 4. Center Section: 4 Feature Badges with clean drawn gold bullet dots
+    feat_x = av_x + 28
+    pill_w = 236
+    pill_h = 36
+    
+    badges = [
+        (feat_x, 532, "4 Studio Hit Soundtracks"),
+        (feat_x + pill_w + 12, 532, "Basanti & Dhanno Rush"),
+        (feat_x, 574, "Iconic Sholay Voice Lines"),
+        (feat_x + pill_w + 12, 574, "Non-Stop Jukebox & Arcade")
+    ]
+    
+    for bx, by, text in badges:
+        d.rounded_rectangle([bx, by, bx + pill_w, by + pill_h], radius=8, fill=(30, 20, 26, 255), outline=(234, 179, 8, 220), width=1)
+        # Draw small golden glowing bullet dot
+        d.ellipse([bx + 14, by + 14, bx + 22, by + 22], fill=(250, 204, 21, 255))
+        d.ellipse([bx + 16, by + 16, bx + 20, by + 20], fill=(255, 255, 255, 255))
+        d.text((bx + 28, by + 9), text, fill=(255, 255, 255, 255), font=font_pill)
+    
+    # 5. Right Section: High-Impact "PLAY FREE NOW" CTA Button
+    btn_x1 = target_w - 260
+    btn_y1 = 530
+    btn_x2 = target_w - 24
+    btn_y2 = 612
+    
+    d.rounded_rectangle([btn_x1, btn_y1, btn_x2, btn_y2], radius=14, fill=(185, 28, 28, 255), outline=(250, 204, 21, 255), width=3)
+    
+    # White play triangle
+    d.polygon([(btn_x1 + 22, btn_y1 + 22), (btn_x1 + 22, btn_y1 + 52), (btn_x1 + 48, btn_y1 + 37)], fill=(255, 255, 255, 255))
+    
+    d.text((btn_x1 + 60, btn_y1 + 17), "PLAY FREE NOW", fill=(255, 255, 255, 255), font=font_bold)
+    d.text((btn_x1 + 60, btn_y1 + 43), "INSTANT IN BROWSER", fill=(254, 240, 138, 255), font=font_badge)
+    
+    # Composite overlay
+    final_img = Image.alpha_composite(banner, overlay).convert("RGB")
+    
+    # 6. Save JPEG at quality=84 (target size: ~240 KB, strictly under 300KB!)
+    jpg_path = "preview.jpg"
+    final_img.save(jpg_path, "JPEG", quality=84, optimize=True)
+    jpg_size = os.path.getsize(jpg_path)
+    print(f"Generated {jpg_path}: {jpg_size} bytes ({jpg_size / 1024:.1f} KB)")
+    
+    # 7. Save PNG with quantized palette (target size: ~260 KB, strictly under 300KB!)
+    png_path = "preview.png"
+    quantized = final_img.quantize(colors=150, method=Image.Resampling.LANCZOS, dither=Image.Dither.FLOYDSTEINBERG)
+    quantized.save(png_path, "PNG", optimize=True)
+    png_size = os.path.getsize(png_path)
+    print(f"Generated {png_path}: {png_size} bytes ({png_size / 1024:.1f} KB)")
+    
+    # Copy to assets/ui/preview.jpg and assets/ui/preview.png
+    shutil.copyfile(jpg_path, "assets/ui/preview.jpg")
+    shutil.copyfile(png_path, "assets/ui/preview.png")
+    print("Updated assets/ui/preview.jpg and assets/ui/preview.png")
 
 if __name__ == "__main__":
     generate_preview()
