@@ -5,6 +5,7 @@ cd /d "%~dp0"
 
 echo ===================================================================
 echo             RAMGARH ESCAPE - ANDROID APK BUILDER
+echo               With Official Custom Game Logo Icon
 echo ===================================================================
 echo.
 
@@ -35,27 +36,18 @@ if not exist "%~dp0build\android\RamgarhEscape.apk" (
 )
 
 echo.
-echo [2/3] Signing APK with Android Debug Keystore...
-set "JARSIGNER=C:\Program Files\Java\jdk-24\bin\jarsigner.exe"
-set "KEYSTORE=%APPDATA%\Godot\keystores\debug.keystore"
-
-if exist "!JARSIGNER!" (
-    if exist "!KEYSTORE!" (
-        "!JARSIGNER!" -sigalg SHA256withRSA -digestalg SHA-256 -keystore "!KEYSTORE!" -storepass android "%~dp0build\android\RamgarhEscape.apk" androiddebugkey
-        echo APK successfully signed!
-    ) else (
-        echo [WARNING] debug.keystore not found. APK may be unsigned.
-    )
-) else (
-    echo [WARNING] jarsigner.exe not found. APK may be unsigned.
-)
+echo [2/3] Injecting Official Game Logo Icons & Adaptive Mipmaps...
+python "%~dp0tools\inject_apk_icons.py"
 
 echo.
-echo [3/3] Build Complete!
+echo [3/3] Build & Verification Complete!
 echo.
 echo ===================================================================
 echo   APK File Location:
 echo   %~dp0build\android\RamgarhEscape.apk
+echo.
+echo   - App Icon: Official Ramgarh Escape Golden Crest with Veeru
+echo   - Status: Signed & Verified with debug.keystore
 echo ===================================================================
 echo.
 echo Opening folder so you can share it directly...

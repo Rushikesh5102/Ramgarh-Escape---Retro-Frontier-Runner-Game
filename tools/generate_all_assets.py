@@ -890,6 +890,13 @@ def create_particles_and_ui():
     with open("assets/sprites/icon.svg", "w", encoding="utf-8") as f:
         f.write(icon_svg)
     print("Saved icon.svg")
+    
+    # Generate high-resolution game icons and Windows/Android packages
+    try:
+        from tools.generate_game_icons import generate_all_icons
+        generate_all_icons()
+    except Exception as e:
+        print(f"Icon generation hook notice: {e}")
 
 if __name__ == "__main__":
     print("--- GENERATING AUDIO ---")

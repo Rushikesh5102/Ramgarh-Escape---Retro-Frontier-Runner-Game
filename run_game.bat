@@ -23,6 +23,13 @@ if not exist "!GODOT_CONSOLE!" (
     if exist "!GODOT_EXE!" set "GODOT_CONSOLE=!GODOT_EXE!"
 )
 
+:: Ensure Windows Shortcut with Game Logo exists
+if not exist "%~dp0Ramgarh Escape.lnk" (
+    if exist "%~dp0tools\create_shortcuts.ps1" (
+        powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\create_shortcuts.ps1" >nul 2>&1
+    )
+)
+
 :: -------------------------------------------------------------
 :: COMMAND LINE ARGUMENT HANDLING
 :: -------------------------------------------------------------
@@ -36,7 +43,7 @@ if /i "%~1"=="2" goto :play_engine
 
 if /i "%~1"=="--test" goto :run_tests
 if /i "%~1"=="test" goto :run_tests
-if /i "%~1"=="3" goto :run_tests
+if /i "%~1"=="4" goto :run_tests
 
 if /i "%~1"=="--export" goto :export_packages
 if /i "%~1"=="--build" goto :export_packages
@@ -45,20 +52,25 @@ if /i "%~1"=="apk" goto :export_packages
 if /i "%~1"=="build" goto :export_packages
 if /i "%~1"=="5" goto :export_packages
 
+if /i "%~1"=="--shortcut" goto :create_shortcut
+if /i "%~1"=="shortcut" goto :create_shortcut
+if /i "%~1"=="6" goto :create_shortcut
+
 if /i "%~1"=="--assets" goto :regenerate_assets
 if /i "%~1"=="assets" goto :regenerate_assets
-if /i "%~1"=="5" goto :regenerate_assets
+if /i "%~1"=="7" goto :regenerate_assets
 
 if /i "%~1"=="--editor" goto :launch_editor
 if /i "%~1"=="editor" goto :launch_editor
-if /i "%~1"=="6" goto :launch_editor
+if /i "%~1"=="8" goto :launch_editor
 
 if /i "%~1"=="--push" goto :git_push
 if /i "%~1"=="push" goto :git_push
-if /i "%~1"=="7" goto :git_push
+if /i "%~1"=="9" goto :git_push
 
 if /i "%~1"=="--web" goto :play_web
 if /i "%~1"=="web" goto :play_web
+if /i "%~1"=="3" goto :play_web
 
 :: -------------------------------------------------------------
 :: INTERACTIVE COMMAND CENTER MENU
@@ -74,14 +86,15 @@ echo   [1] Play Game (Standalone Windows Executable)
 echo   [2] Play Game (Direct Godot Engine Mode)
 echo   [3] Play Game (Web Browser - GitHub Pages Mode)
 echo   [4] Run Automated QA Test Suite (Headless - 107 Tests)
-echo   [5] Build Android APK & Release Packages (build\android\RamgarhEscape.apk)
-echo   [6] Regenerate Refined Sprites, Audio ^& Preview Banner
-echo   [7] Launch Project in Godot 4 Editor
-echo   [8] Sync ^& Push Latest Code to GitHub
-echo   [9] Exit
+echo   [5] Build Android APK with Official Game Logo (RamgarhEscape.apk)
+echo   [6] Create / Refresh Windows Desktop Shortcut with Game Logo
+echo   [7] Regenerate Refined Sprites, Audio, Icons ^& Preview Banner
+echo   [8] Launch Project in Godot 4 Editor
+echo   [9] Sync ^& Push Latest Code to GitHub
+echo   [X] Exit
 echo.
 echo ===================================================================
-choice /c 123456789 /t 6 /d 1 /m "Select option (Auto-launches [1] in 6s):"
+choice /c 123456789x /t 6 /d 1 /m "Select option (Auto-launches [1] in 6s):"
 set "OPT=%ERRORLEVEL%"
 
 if "%OPT%"=="1" goto :play_standalone
@@ -89,10 +102,11 @@ if "%OPT%"=="2" goto :play_engine
 if "%OPT%"=="3" goto :play_web
 if "%OPT%"=="4" goto :run_tests
 if "%OPT%"=="5" goto :export_packages
-if "%OPT%"=="6" goto :regenerate_assets
-if "%OPT%"=="7" goto :launch_editor
-if "%OPT%"=="8" goto :git_push
-if "%OPT%"=="9" goto :eof
+if "%OPT%"=="6" goto :create_shortcut
+if "%OPT%"=="7" goto :regenerate_assets
+if "%OPT%"=="8" goto :launch_editor
+if "%OPT%"=="9" goto :git_push
+if "%OPT%"=="10" goto :eof
 goto :menu
 
 :: -------------------------------------------------------------
@@ -186,19 +200,12 @@ echo [1/3] Exporting Windows Desktop Package (build\windows\RamgarhEscape.pck)..
 echo [2/3] Exporting Android APK (build\android\RamgarhEscape.apk)...
 "!GODOT_CONSOLE!" --headless --path "%~dp0." --export-debug Android "%~dp0build\android\RamgarhEscape.apk"
 
-echo [3/3] Signing APK with Android Debug Keystore...
-set "JARSIGNER=C:\Program Files\Java\jdk-24\bin\jarsigner.exe"
-set "KEYSTORE=%APPDATA%\Godot\keystores\debug.keystore"
-if exist "!JARSIGNER!" (
-    if exist "!KEYSTORE!" (
-        "!JARSIGNER!" -sigalg SHA256withRSA -digestalg SHA-256 -keystore "!KEYSTORE!" -storepass android "%~dp0build\android\RamgarhEscape.apk" androiddebugkey >nul 2>&1
-        echo APK successfully signed and ready for installation!
-    )
-)
+echo [3/3] Injecting Official Game Logo Icons & Signing APK...
+python "%~dp0tools\inject_apk_icons.py"
 
 echo.
 echo ===================================================================
-echo [SUCCESS] Android APK created at:
+echo [SUCCESS] Android APK with Game Logo created at:
 echo   %~dp0build\android\RamgarhEscape.apk
 echo ===================================================================
 explorer.exe /select,"%~dp0build\android\RamgarhEscape.apk"
@@ -207,7 +214,22 @@ pause
 goto :menu
 
 :: -------------------------------------------------------------
-:: OPTION 5: REGENERATE REFINED ASSETS & SPRITES
+:: OPTION 6: CREATE / REFRESH WINDOWS GAME SHORTCUT WITH LOGO
+:: -------------------------------------------------------------
+:create_shortcut
+echo.
+echo ===================================================================
+echo     CREATING WINDOWS DESKTOP SHORTCUT WITH OFFICIAL GAME LOGO
+echo ===================================================================
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\create_shortcuts.ps1"
+echo.
+echo Shortcut created on Desktop and in folder with official game logo!
+if "!IS_CLI!"=="1" exit /b 0
+pause
+goto :menu
+
+:: -------------------------------------------------------------
+:: OPTION 7: REGENERATE REFINED ASSETS & SPRITES
 :: -------------------------------------------------------------
 :regenerate_assets
 echo.
