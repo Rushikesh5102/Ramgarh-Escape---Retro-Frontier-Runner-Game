@@ -6,6 +6,9 @@ extends Node2D
 
 const OBSTACLE_SCENE = preload("res://scenes/obstacle.tscn")
 const COIN_SCENE = preload("res://scenes/coin.tscn")
+const JHUMKA_SCENE = preload("res://scenes/collectible_jhumka.tscn")
+const SPECTATOR_SCENE = preload("res://scenes/basanti_spectator.tscn")
+const TANGA_COMPANION_SCENE = preload("res://scenes/basanti_tanga_companion.tscn")
 
 const GROUND_Y: float = 460.0
 const SPAWN_X: float = 1260.0
@@ -23,20 +26,40 @@ var next_spawn_interval: float = 2.8 # Safe starting runway
 
 var types = ["rock", "cart", "crate", "spikes"]
 var must_spawn_breather: bool = false
+var next_spectator_distance: float = 220.0
 
 func _ready() -> void:
 	spawn_timer = 0.0
 	next_spawn_interval = 2.8 # Safe starting runway
 	must_spawn_breather = false
+	next_spectator_distance = 220.0
+	if GameManager.has_signal("fever_changed"):
+		GameManager.fever_changed.connect(_on_fever_changed)
+
+func _on_fever_changed(fever_val: float, is_active: bool) -> void:
+	if is_active and get_node_or_null("ActiveTangaCompanion") == null:
+		var tanga = TANGA_COMPANION_SCENE.instantiate()
+		tanga.name = "ActiveTangaCompanion"
+		add_child(tanga)
 
 func _physics_process(delta: float) -> void:
 	if GameManager.current_state != GameManager.State.RUNNING:
 		return
 		
+	# Check for Roadside Basanti Spectator milestones
+	if GameManager.distance_traveled >= next_spectator_distance:
+		spawn_basanti_spectator()
+		next_spectator_distance += randf_range(280.0, 420.0)
+		
 	spawn_timer += delta
 	if spawn_timer >= next_spawn_interval:
 		spawn_timer = 0.0
 		execute_spawn_sequence()
+
+func spawn_basanti_spectator() -> void:
+	var spec = SPECTATOR_SCENE.instantiate()
+	spec.position = Vector2(SPAWN_X + 220.0, GROUND_Y + 15.0)
+	add_child(spec)
 
 ## Calculates the absolute minimum safe distance between any two obstacles
 ## to ensure it is physically conquerable (jump airtime + landing reaction + width)
@@ -133,20 +156,33 @@ func spawn_coin_arc(center_x: float, base_y: float) -> void:
 	var count = 5
 	var arc_width = 240.0
 	var arc_height = 110.0
+	var spawn_jhumka_at_apex = randf() < 0.28
 	for i in range(count):
 		var t = float(i) / float(count - 1) # 0.0 to 1.0
 		var offset_x = (t - 0.5) * arc_width
 		var offset_y = -4.0 * t * (1.0 - t) * arc_height
 		
-		var coin = COIN_SCENE.instantiate()
-		coin.position = Vector2(center_x + offset_x, base_y + offset_y)
-		add_child(coin)
+		# Apex item (i == 2): chance to spawn sparkling Golden Jhumka!
+		if i == 2 and spawn_jhumka_at_apex:
+			var jhumka = JHUMKA_SCENE.instantiate()
+			jhumka.position = Vector2(center_x + offset_x, base_y + offset_y)
+			add_child(jhumka)
+		else:
+			var coin = COIN_SCENE.instantiate()
+			coin.position = Vector2(center_x + offset_x, base_y + offset_y)
+			add_child(coin)
 
 func spawn_coin_line(start_x: float, ground_y: float, count: int) -> void:
+	var spawn_jhumka = randf() < 0.22
 	for i in range(count):
-		var coin = COIN_SCENE.instantiate()
-		coin.position = Vector2(start_x + (i * 55.0), ground_y)
-		add_child(coin)
+		if i == count - 1 and spawn_jhumka:
+			var jhumka = JHUMKA_SCENE.instantiate()
+			jhumka.position = Vector2(start_x + (i * 55.0), ground_y)
+			add_child(jhumka)
+		else:
+			var coin = COIN_SCENE.instantiate()
+			coin.position = Vector2(start_x + (i * 55.0), ground_y)
+			add_child(coin)
 
 func clear_all_spawned() -> void:
 	for child in get_children():

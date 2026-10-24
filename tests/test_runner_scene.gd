@@ -21,6 +21,7 @@ func _ready() -> void:
 	test_parallax_bg()
 	test_main_menu()
 	test_audio_controls()
+	test_bollywood_fever_and_companion()
 	
 	print("\n========================================================")
 	print("  TEST SUMMARY: %d Passed, %d Failed (Total %d)" % [passed_tests, failed_tests, total_tests])
@@ -253,6 +254,8 @@ func test_main_menu() -> void:
 	assert_true(menu.total_coins_label.text.length() > 0, "TotalCoinsLabel populated with text")
 	assert_true(menu.bike_preview != null, "MainMenu has BikePreview")
 	assert_true(menu.dust_particles != null, "MainMenu has DustParticles")
+	assert_true(menu.basanti_preview != null, "MainMenu has BasantiPreview")
+	assert_true(menu.music_btn != null, "MainMenu has MusicBtn (Jukebox)")
 	
 	menu.queue_free()
 
@@ -284,4 +287,65 @@ func test_audio_controls() -> void:
 	AudioManager.play_sfx("button")
 	AudioManager.play_sfx("start")
 	assert_true(true, "All standard gameplay sound effects triggered safely")
+
+func test_bollywood_fever_and_companion() -> void:
+	print("\n--- 10. Testing Bollywood Soundtrack, Basanti & Fever Mode ---")
+	# 1. Test Multiple BGM Tracks & Jukebox
+	assert_true(AudioManager.bgm_tracks.size() >= 3, "AudioManager loaded multiple Bollywood tracks (%d tracks)" % AudioManager.bgm_tracks.size())
+	assert_true(AudioManager.bgm_tracks.has("Yeh Dosti"), "Track 'Yeh Dosti' exists")
+	assert_true(AudioManager.bgm_tracks.has("Chal Dhanno!"), "Track 'Chal Dhanno!' exists")
+	assert_true(AudioManager.bgm_tracks.has("Mehbooba Groove"), "Track 'Mehbooba Groove' exists")
+	
+	var initial_track = AudioManager.get_current_track_title()
+	var next_track = AudioManager.next_track()
+	assert_true(next_track.length() > 0, "Jukebox switches to next track ('%s')" % next_track)
+	assert_true(AudioManager.get_current_track_title() == next_track, "Current track title matches switched track")
+	
+	# 2. Test New Dialogue & Voice SFX
+	var voice_sfx = ["basanti_cheer", "dhanno_gallop", "fever_start", "gabbar_laugh", "harmonica_riff", "jhumka"]
+	for s in voice_sfx:
+		assert_true(AudioManager.sounds.has(s) and AudioManager.sounds[s] != null, "Voice/Companion SFX '%s' loaded" % s)
+		AudioManager.play_sfx(s)
+		
+	# 3. Test Basanti Fever & Dhanno Rush Progression
+	GameManager.start_game()
+	assert_true(GameManager.fever_meter == 0.0, "Initial fever meter is 0%")
+	assert_true(not GameManager.is_fever_active, "Fever mode is initially inactive")
+	
+	# Collect Jhumka (+35% fever)
+	GameManager.collect_jhumka()
+	assert_true(GameManager.fever_meter >= 35.0, "Jhumka increases fever meter to >= 35%")
+	
+	# Fill fever to 100% and activate
+	GameManager.activate_fever()
+	assert_true(GameManager.is_fever_active == true, "Dhanno Rush activates successfully")
+	assert_true(GameManager.fever_timer > 0.0, "Fever timer initialized")
+	
+	# End fever
+	GameManager.end_fever()
+	assert_true(GameManager.is_fever_active == false, "Fever mode deactivates cleanly")
+	
+	# 4. Test Companion & Spectator Scene Loading
+	var spec_scene = load("res://scenes/basanti_spectator.tscn")
+	assert_true(spec_scene != null, "BasantiSpectator scene loads successfully")
+	var spec = spec_scene.instantiate()
+	add_child(spec)
+	assert_true(spec.get_node_or_null("Sprite2D") != null, "BasantiSpectator has Sprite2D")
+	assert_true(spec.get_node_or_null("RoseParticles") != null, "BasantiSpectator has RoseParticles")
+	spec.queue_free()
+	
+	var tanga_scene = load("res://scenes/basanti_tanga_companion.tscn")
+	assert_true(tanga_scene != null, "BasantiTangaCompanion scene loads successfully")
+	var tanga = tanga_scene.instantiate()
+	add_child(tanga)
+	assert_true(tanga.get_node_or_null("Sprite2D") != null, "BasantiTangaCompanion has Sprite2D")
+	tanga.queue_free()
+	
+	var jhumka_scene = load("res://scenes/collectible_jhumka.tscn")
+	assert_true(jhumka_scene != null, "CollectibleJhumka scene loads successfully")
+	var jhumka = jhumka_scene.instantiate()
+	add_child(jhumka)
+	assert_true(jhumka.get_node_or_null("Sprite2D") != null, "CollectibleJhumka has Sprite2D")
+	jhumka.queue_free()
+
 

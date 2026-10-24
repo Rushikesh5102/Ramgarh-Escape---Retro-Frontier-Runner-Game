@@ -53,4 +53,15 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.has_method("die"):
-		body.die()
+		if GameManager.is_fever_active:
+			# Dhanno Rush Fever! Shatter obstacle and award bonus points!
+			AudioManager.play_sfx("hit", 1.4)
+			GameManager.current_score += 200
+			GameManager.score_changed.emit(int(GameManager.distance_traveled), GameManager.coins_collected, GameManager.current_score)
+			set_deferred("monitoring", false)
+			var tween = create_tween()
+			tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.2), 0.15)
+			tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.15)
+			tween.tween_callback(queue_free)
+		else:
+			body.die()

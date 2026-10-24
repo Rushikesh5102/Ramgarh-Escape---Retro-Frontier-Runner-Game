@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
@@ -8,9 +8,11 @@
 [ext_resource type="Texture2D" path="res://assets/ui/logo.png" id="6_logo"]
 [ext_resource type="Texture2D" path="res://assets/sprites/player_run_0.png" id="7_bike"]
 [ext_resource type="Texture2D" path="res://assets/sprites/particle_dust.png" id="8_dust"]
-[ext_resource type="FontFile" path="res://assets/fonts/title_font.ttf" id="9_title_font"]
-[ext_resource type="FontFile" path="res://assets/fonts/ui_font.ttf" id="10_ui_font"]
-[ext_resource type="PackedScene" path="res://scenes/settings_menu.tscn" id="11_settings"]
+[ext_resource type="Texture2D" path="res://assets/sprites/basanti_cheer_0.png" id="9_basanti"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_music.png" id="10_music"]
+[ext_resource type="FontFile" path="res://assets/fonts/title_font.ttf" id="11_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/ui_font.ttf" id="12_ui_font"]
+[ext_resource type="PackedScene" path="res://scenes/settings_menu.tscn" id="13_settings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
 bg_color = Color(0.12, 0.08, 0.1, 0.85)
@@ -75,6 +77,10 @@ scale_amount_min = 0.3
 scale_amount_max = 0.6
 color = Color(0.9, 0.75, 0.55, 0.75)
 
+[node name="BasantiPreview" type="Sprite2D" parent="."]
+position = Vector2(130, 470)
+texture = ExtResource("9_basanti")
+
 [node name="UI" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -96,7 +102,7 @@ offset_right = 300.0
 offset_bottom = 270.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 16
 alignment = 1
 
 [node name="Logo" type="TextureRect" parent="UI/MainVBox"]
@@ -118,7 +124,7 @@ theme_override_constants/separation = 4
 
 [node name="BestScoreLabel" type="Label" parent="UI/MainVBox/RecordBox/VBox"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_fonts/font = ExtResource("12_ui_font")
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
 text = "High Score: 0 pts  |  Best Run: 0 m"
@@ -126,7 +132,7 @@ horizontal_alignment = 1
 
 [node name="TotalCoinsLabel" type="Label" parent="UI/MainVBox/RecordBox/VBox"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("10_ui_font")
+theme_override_fonts/font = ExtResource("12_ui_font")
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
 text = "Total Coins: 0"
@@ -136,28 +142,38 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="PlayBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("9_title_font")
+theme_override_fonts/font = ExtResource("11_title_font")
 theme_override_font_sizes/font_size = 28
 theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
 text = "PLAY ESCAPE"
 
-[node name="SettingsBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
-custom_minimum_size = Vector2(0, 50)
+[node name="MusicBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("10_ui_font")
-theme_override_font_sizes/font_size = 20
+theme_override_fonts/font = ExtResource("12_ui_font")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "🎵 Track: Yeh Dosti"
+icon = ExtResource("10_music")
+expand_icon = true
+
+[node name="SettingsBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("12_ui_font")
+theme_override_font_sizes/font_size = 18
 text = "SETTINGS"
 
 [node name="QuitBtn" type="Button" parent="UI/MainVBox/ButtonBox"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("10_ui_font")
-theme_override_font_sizes/font_size = 20
+theme_override_fonts/font = ExtResource("12_ui_font")
+theme_override_font_sizes/font_size = 18
 text = "QUIT"
 
-[node name="SettingsMenu" parent="." instance=ExtResource("11_settings")]
+[node name="SettingsMenu" parent="." instance=ExtResource("13_settings")]

@@ -22,12 +22,19 @@ func _ready() -> void:
 	sounds["button"] = load("res://assets/audio/sfx_button.wav")
 	sounds["start"] = load("res://assets/audio/sfx_start.wav")
 	
-	# Setup BGM player
+	# New Bollywood dialogue, companion & fever sound effects
+	sounds["basanti_cheer"] = load("res://assets/audio/sfx_basanti_cheer.wav")
+	sounds["dhanno_gallop"] = load("res://assets/audio/sfx_dhanno_gallop.wav")
+	sounds["fever_start"] = load("res://assets/audio/sfx_fever_start.wav")
+	sounds["gabbar_laugh"] = load("res://assets/audio/sfx_gabbar_laugh.wav")
+	sounds["harmonica_riff"] = load("res://assets/audio/sfx_harmonica_riff.wav")
+	sounds["jhumka"] = load("res://assets/audio/sfx_jhumka.wav")
+	
+	# Setup BGM Playlist (Multiple Songs)
+	load_bgm_tracks()
+	
 	bgm_player = AudioStreamPlayer.new()
-	var bgm_stream = load("res://assets/audio/bgm_escape.wav")
-	if bgm_stream is AudioStreamWAV:
-		bgm_stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	bgm_player.stream = bgm_stream
+	bgm_player.stream = bgm_tracks[track_titles[current_track_idx]]
 	bgm_player.bus = "Master"
 	add_child(bgm_player)
 	bgm_player.finished.connect(_on_bgm_finished)
@@ -42,25 +49,65 @@ func _ready() -> void:
 	# Apply saved audio volume
 	apply_audio_settings()
 
+var bgm_tracks: Dictionary = {}
+var track_titles: Array[String] = ["Yeh Dosti", "Chal Dhanno!", "Mehbooba Groove", "Frontier Escape"]
+var current_track_idx: int = 0
+signal track_changed(track_title: String)
+
+func load_bgm_tracks() -> void:
+	var files = {
+		"Yeh Dosti": "res://assets/audio/bgm_yeh_dosti.wav",
+		"Chal Dhanno!": "res://assets/audio/bgm_chal_dhanno.wav",
+		"Mehbooba Groove": "res://assets/audio/bgm_mehbooba.wav",
+		"Frontier Escape": "res://assets/audio/bgm_escape.wav"
+	}
+	for title in files.keys():
+		var stream = load(files[title])
+		if stream is AudioStreamWAV:
+			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		bgm_tracks[title] = stream
+
 func apply_audio_settings() -> void:
 	if SaveManager.is_muted:
 		bgm_player.volume_db = -80.0
 	else:
 		bgm_player.volume_db = linear_to_db(SaveManager.music_volume)
 
-func play_bgm() -> void:
+func play_bgm(track_name: String = "") -> void:
+	if track_name != "" and bgm_tracks.has(track_name):
+		current_track_idx = track_titles.find(track_name)
+		bgm_player.stream = bgm_tracks[track_name]
+		track_changed.emit(track_name)
+	elif bgm_player.stream == null and track_titles.size() > 0:
+		bgm_player.stream = bgm_tracks[track_titles[current_track_idx]]
+		
+	apply_audio_settings()
 	if not bgm_player.playing:
+		bgm_player.play()
+
+func next_track() -> String:
+	current_track_idx = (current_track_idx + 1) % track_titles.size()
+	var new_title = track_titles[current_track_idx]
+	var was_playing = bgm_player.playing
+	bgm_player.stop()
+	bgm_player.stream = bgm_tracks[new_title]
+	track_changed.emit(new_title)
+	if was_playing:
 		apply_audio_settings()
 		bgm_player.play()
+	return new_title
+
+func get_current_track_title() -> String:
+	if current_track_idx < track_titles.size():
+		return track_titles[current_track_idx]
+	return "Yeh Dosti"
 
 func stop_bgm() -> void:
 	bgm_player.stop()
 
 func _on_bgm_finished() -> void:
 	# Loop background music seamlessly
-	if bgm_player.playing:
-		bgm_player.play()
-	else:
+	if bgm_player.stream != null:
 		bgm_player.play()
 
 func play_sfx(sound_name: String, pitch_scale: float = 1.0) -> void:

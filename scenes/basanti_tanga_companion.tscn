@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/basanti_tanga_companion.gd" id="1_tanga"]
+[ext_resource type="Texture2D" path="res://assets/sprites/basanti_dhanno_tanga_0.png" id="2_sprite"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particle_dust.png" id="3_dust"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particle_rose.png" id="4_rose"]
+
+[node name="BasantiTangaCompanion" type="Node2D"]
+script = ExtResource("1_tanga")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -65)
+texture = ExtResource("2_sprite")
+
+[node name="DustParticles" type="CPUParticles2D" parent="."]
+position = Vector2(-70, -10)
+amount = 14
+lifetime = 0.5
+texture = ExtResource("3_dust")
+direction = Vector2(-1, -0.3)
+spread = 25.0
+gravity = Vector2(0, 40)
+initial_velocity_min = 120.0
+initial_velocity_max = 220.0
+scale_amount_min = 0.5
+scale_amount_max = 1.1
+color = Color(0.85, 0.72, 0.55, 0.7)
+
+[node name="RoseParticles" type="CPUParticles2D" parent="."]
+position = Vector2(-10, -80)
+amount = 8
+lifetime = 0.8
+texture = ExtResource("4_rose")
+direction = Vector2(-1, -0.8)
+spread = 45.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 60.0
+initial_velocity_max = 140.0
+angular_velocity_min = -120.0
+angular_velocity_max = 120.0
+scale_amount_min = 0.7
+scale_amount_max = 1.2
