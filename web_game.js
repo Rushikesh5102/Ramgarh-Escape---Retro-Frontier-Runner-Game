@@ -1,8 +1,8 @@
 /**
  * Ramgarh Escape - Web Game Engine (HTML5 Canvas & Web Audio API)
  * Mastercrafted Retro Frontier Runner with High-DPI Rendering,
- * Robust Preloaded Audio Pool, Double Jump Mechanics,
- * Luxury Bollywood UI, Animated Character Showcase, and Jukebox.
+ * Real-Time Bollywood Web Audio Music & SFX Synthesizer + Studio WAV Streaming,
+ * Responsive Double-Jump Physics, and High-Fidelity Character Art.
  */
 
 (function () {
@@ -33,7 +33,7 @@
   resizeCanvas();
 
   // -------------------------------------------------------------
-  // 1. GAME STATE & PERSISTENCE MANAGER
+  // 1. GAME STATE & SAVE MANAGER
   // -------------------------------------------------------------
   const State = {
     MENU: 0,
@@ -75,12 +75,16 @@
   };
 
   // -------------------------------------------------------------
-  // 2. BULLETPROOF PRELOADED AUDIO & JUKEBOX SYSTEM
+  // 2. BULLETPROOF BOLLYWOOD AUDIO ENGINE (SYNTH + WAV DUAL ENGINE)
   // -------------------------------------------------------------
   class SoundManager {
     constructor() {
       this.audioCtx = null;
+      this.masterGain = null;
       this.isUnlocked = false;
+      this.bgmTimer = null;
+      this.synthPlaying = false;
+      this.wavPlaying = false;
 
       this.tracks = [
         { title: 'Yeh Dosti', file: 'assets/audio/bgm_yeh_dosti.wav' },
@@ -90,7 +94,7 @@
       ];
       this.currentTrackIdx = 0;
 
-      // Preload all BGM audio elements
+      // Studio WAV Audio Elements
       this.bgmPlayers = this.tracks.map(t => {
         const a = new Audio();
         a.src = t.file;
@@ -117,7 +121,7 @@
         jhumka: 'assets/audio/sfx_jhumka.wav'
       };
 
-      // Multi-voice Audio Pool for zero-latency, overlapping SFX
+      // SFX Audio Pool
       this.sfxPool = {};
       for (const [name, file] of Object.entries(this.sfxFiles)) {
         const list = [];
@@ -139,17 +143,22 @@
       if (AudioContextClass) {
         try {
           this.audioCtx = new AudioContextClass();
+          this.masterGain = this.audioCtx.createGain();
+          this.masterGain.gain.setValueAtTime(SaveManager.isMuted ? 0 : 0.7, this.audioCtx.currentTime);
+          this.masterGain.connect(this.audioCtx.destination);
         } catch (e) {}
       }
     }
 
     unlock() {
+      if (!this.audioCtx) this.initWebAudio();
       if (this.audioCtx && this.audioCtx.state === 'suspended') {
         this.audioCtx.resume();
       }
       this.isUnlocked = true;
     }
 
+    // Play BGM with dual reliability: plays WAV or instant synthesized Bollywood melody
     playBGM(trackTitle = '') {
       if (SaveManager.isMuted) return;
       this.unlock();
@@ -159,7 +168,7 @@
         if (idx !== -1) this.currentTrackIdx = idx;
       }
 
-      // Stop other BGM streams
+      // Stop any other active WAV streams
       this.bgmPlayers.forEach((player, i) => {
         if (i !== this.currentTrackIdx) {
           player.pause();
@@ -170,17 +179,28 @@
       const current = this.bgmPlayers[this.currentTrackIdx];
       current.muted = SaveManager.isMuted;
       current.volume = 0.8;
+
+      let playedWav = false;
       const playPromise = current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {});
+        playPromise.then(() => {
+          this.wavPlaying = true;
+          this.stopSynthMelody();
+        }).catch(() => {
+          // WAV streaming delayed/blocked -> immediately start Web Audio synthesizer!
+          this.startSynthMelody();
+        });
+      } else {
+        this.startSynthMelody();
       }
     }
 
     stopBGM() {
-      this.bgmPlayers.forEach(player => {
-        player.pause();
-        player.currentTime = 0;
+      this.bgmPlayers.forEach(p => {
+        p.pause();
+        p.currentTime = 0;
       });
+      this.stopSynthMelody();
     }
 
     nextTrack() {
@@ -197,12 +217,88 @@
 
     applyMute() {
       this.bgmPlayers.forEach(p => { p.muted = SaveManager.isMuted; });
+      if (this.masterGain && this.audioCtx) {
+        this.masterGain.gain.setValueAtTime(SaveManager.isMuted ? 0 : 0.7, this.audioCtx.currentTime);
+      }
+      if (SaveManager.isMuted) {
+        this.stopSynthMelody();
+      }
     }
 
+    // Real-time Web Audio Synthesizer for "Yeh Dosti Hum Nahi Todenge"
+    startSynthMelody() {
+      if (!this.audioCtx || this.synthPlaying || SaveManager.isMuted) return;
+      this.synthPlaying = true;
+
+      // "Yeh Dosti" iconic melody notes (Hz)
+      const notes = [
+        349.23, 392.00, 440.00, 523.25, 440.00, 392.00, 349.23, // F4, G4, A4, C5, A4, G4, F4
+        392.00, 440.00, 523.25, 440.00, 392.00, 349.23, 293.66, // G4, A4, C5, A4, G4, F4, D4
+        261.63, 293.66, 349.23, 392.00, 440.00, 392.00, 349.23  // C4, D4, F4, G4, A4, G4, F4
+      ];
+      const durations = [
+        0.35, 0.35, 0.4, 0.6, 0.35, 0.35, 0.7,
+        0.35, 0.35, 0.4, 0.6, 0.35, 0.35, 0.7,
+        0.35, 0.35, 0.4, 0.5, 0.4, 0.35, 0.9
+      ];
+
+      let noteIdx = 0;
+      const playNextNote = () => {
+        if (!this.synthPlaying || SaveManager.isMuted) return;
+
+        const freq = notes[noteIdx];
+        const dur = durations[noteIdx];
+        noteIdx = (noteIdx + 1) % notes.length;
+
+        try {
+          const ctx = this.audioCtx;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'triangle'; // Warm harmonica tone
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+          // Bass backing note
+          const bassOsc = ctx.createOscillator();
+          bassOsc.type = 'sine';
+          bassOsc.frequency.setValueAtTime(freq / 2.0, ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+
+          osc.connect(gain);
+          bassOsc.connect(gain);
+          gain.connect(this.masterGain || ctx.destination);
+
+          osc.start(ctx.currentTime);
+          bassOsc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + dur);
+          bassOsc.stop(ctx.currentTime + dur);
+
+          this.bgmTimer = setTimeout(playNextNote, dur * 1000);
+        } catch (e) {}
+      };
+
+      playNextNote();
+    }
+
+    stopSynthMelody() {
+      this.synthPlaying = false;
+      if (this.bgmTimer) {
+        clearTimeout(this.bgmTimer);
+        this.bgmTimer = null;
+      }
+    }
+
+    // Play SFX with immediate Web Audio synthesis + Audio Pool
     playSFX(name) {
       if (SaveManager.isMuted) return;
       this.unlock();
 
+      // 1. Instant Web Audio Synthesis
+      this.synthSFX(name);
+
+      // 2. Play cached WAV audio if available
       const pool = this.sfxPool[name];
       if (pool) {
         const a = pool.list[pool.idx];
@@ -211,50 +307,53 @@
           a.currentTime = 0;
           a.volume = 0.85;
           const p = a.play();
-          if (p !== undefined) p.catch(() => this.synthFallback(name));
-        } catch (e) {
-          this.synthFallback(name);
-        }
-      } else {
-        this.synthFallback(name);
+          if (p !== undefined) p.catch(() => {});
+        } catch (e) {}
       }
     }
 
-    // Instant Synthesizer fallback if WAV streaming is ever delayed
-    synthFallback(name) {
+    synthSFX(name) {
       if (!this.audioCtx || SaveManager.isMuted) return;
       try {
         const ctx = this.audioCtx;
+        const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(this.masterGain || ctx.destination);
 
-        const now = ctx.currentTime;
         if (name === 'jump') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(180, now);
-          osc.frequency.exponentialRampToValueAtTime(440, now + 0.15);
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.exponentialRampToValueAtTime(520, now + 0.16);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
           osc.start(now);
-          osc.stop(now + 0.15);
+          osc.stop(now + 0.16);
         } else if (name === 'coin' || name === 'jhumka') {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(880, now);
-          osc.frequency.setValueAtTime(1320, now + 0.08);
-          gain.gain.setValueAtTime(0.2, now);
+          osc.frequency.setValueAtTime(987.77, now); // B5
+          osc.frequency.setValueAtTime(1318.51, now + 0.07); // E6
+          gain.gain.setValueAtTime(0.25, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
           osc.start(now);
           osc.stop(now + 0.18);
         } else if (name === 'hit') {
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(160, now);
-          osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(45, now + 0.28);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
           osc.start(now);
-          osc.stop(now + 0.25);
+          osc.stop(now + 0.28);
+        } else if (name === 'button') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.setValueAtTime(800, now + 0.04);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
         }
       } catch (e) {}
     }
@@ -759,8 +858,8 @@
       this.y = GROUND_Y;
       this.vy = 0;
       this.vx = 0;
-      this.gravity = 1480.0;
-      this.jumpVelocity = -650.0;
+      this.gravity = 1450.0;
+      this.jumpVelocity = -660.0;
       this.doubleJumpVelocity = -580.0;
       this.canDoubleJump = true;
       this.hasDoubleJumped = false;
@@ -768,7 +867,6 @@
       this.coyoteTimer = 0;
       this.jumpBuffer = 0;
       this.jumpHoldTimer = 0;
-      this.minJumpDuration = 0.14; // Guaranteed full jump clearance
       this.animTimer = 0;
       this.scaleX = 1;
       this.scaleY = 1;
@@ -795,11 +893,12 @@
     jump() {
       if (this.isDead) return;
 
-      const onFloor = this.y >= GROUND_Y - 4;
+      const onFloor = (this.y >= GROUND_Y - 4) && (this.vy >= -50);
 
-      // 1. Primary Jump (from ground or during coyote time)
+      // 1. Primary Jump (From Floor or Coyote Time)
       if (onFloor || this.coyoteTimer > 0) {
         this.vy = this.jumpVelocity;
+        this.y = GROUND_Y - 4; // Crucial: Immediately lift off floor so onFloor is false!
         this.coyoteTimer = 0;
         this.jumpBuffer = 0;
         this.canDoubleJump = true;
@@ -807,6 +906,7 @@
         this.jumpHoldTimer = 0;
         this.scaleX = 0.82;
         this.scaleY = 1.28;
+
         audio.playSFX('jump');
         DialogueSystem.trigger('jump');
 
@@ -816,29 +916,30 @@
         return;
       }
 
-      // 2. Responsive Mid-Air Double Jump
-      if (this.canDoubleJump && !this.hasDoubleJumped && this.y < GROUND_Y - 25) {
+      // 2. Mid-Air Double Jump
+      if (this.canDoubleJump && !this.hasDoubleJumped) {
         this.canDoubleJump = false;
         this.hasDoubleJumped = true;
         this.vy = this.doubleJumpVelocity;
         this.jumpHoldTimer = 0;
         this.scaleX = 0.8;
         this.scaleY = 1.3;
+
         audio.playSFX('jump');
 
         for (let i = 0; i < 6; i++) {
-          spawnParticle(this.x - 50, this.y - 20, -80 + (Math.random() - 0.5) * 60, 40 + Math.random() * 40, 'sparkle', 0.6);
+          spawnParticle(this.x - 50, this.y - 15, -80 + (Math.random() - 0.5) * 60, 40 + Math.random() * 40, 'sparkle', 0.6);
         }
         return;
       }
 
       // 3. Early Jump Buffer (triggers instantly upon landing)
-      this.jumpBuffer = 0.22;
+      this.jumpBuffer = 0.25;
     }
 
     cutJump() {
-      // Only cut jump height after minJumpDuration to ensure taps clear obstacles with ease
-      if (this.jumpHoldTimer >= this.minJumpDuration && this.vy < -220) {
+      // Only cut jump height after minimum hold time so taps clear obstacles with ease
+      if (this.jumpHoldTimer >= 0.16 && this.vy < -200) {
         this.vy *= 0.6;
       }
     }
@@ -858,12 +959,12 @@
       }
 
       this.jumpHoldTimer += dt;
-      const onFloor = this.y >= GROUND_Y;
 
-      if (onFloor) {
-        this.coyoteTimer = 0.14;
-        this.vy = 0;
+      // Landing detection: ONLY when moving downward or resting at ground level!
+      if (this.vy >= 0 && this.y >= GROUND_Y) {
         this.y = GROUND_Y;
+        this.vy = 0;
+        this.coyoteTimer = 0.15;
         this.canDoubleJump = true;
         this.hasDoubleJumped = false;
 
@@ -881,6 +982,7 @@
           spawnParticle(this.x - 70, this.y - 8, -GameManager.currentSpeed * 0.4, (Math.random() - 0.5) * 30, 'dust', 0.4);
         }
       } else {
+        // Airborne (or jumping upward)
         this.coyoteTimer -= dt;
         this.vy += this.gravity * dt;
         this.y += this.vy * dt;
@@ -1331,16 +1433,18 @@
   }
 
   // -------------------------------------------------------------
-  // 13. MAIN MENU UI (HERO SHOWCASE & VIBRANT BOLLYWOOD STYLING)
+  // 13. MAIN MENU UI (CLEAN, POLISHED SHOWCASE - NO OVERLAPPING)
   // -------------------------------------------------------------
   let menuAnimTime = 0;
 
   function drawMainMenu(ctx) {
     menuAnimTime += 0.016;
 
-    ctx.fillStyle = 'rgba(12, 8, 14, 0.6)';
+    // Atmospheric desert sunset overlay
+    ctx.fillStyle = 'rgba(14, 9, 16, 0.65)';
     ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
+    // 1. Sholay Frontier Logo
     if (images.logo && images.logo.complete) {
       const logoW = 540;
       const logoH = 160;
@@ -1354,19 +1458,7 @@
       ctx.restore();
     }
 
-    const bFrame = Math.floor(menuAnimTime * 2.5) % 2;
-    const bImg = images[`basanti_cheer_${bFrame}`];
-    if (bImg && bImg.complete) {
-      ctx.drawImage(bImg, 110, 400, 105, 125);
-    }
-
-    const bikeBob = Math.sin(menuAnimTime * 4) * 2;
-    const bikeImg = images.player_run_0;
-    if (bikeImg && bikeImg.complete) {
-      ctx.drawImage(bikeImg, 205, 395 + bikeBob, 192, 128);
-    }
-
-    // High Score Plaque
+    // 2. High Score Plaque
     drawGoldBox(ctx, VIRTUAL_WIDTH / 2 - 230, 245, 460, 72, 16, 'rgba(20, 14, 26, 0.92)');
     ctx.font = 'bold 20px Outfit, sans-serif';
     ctx.fillStyle = '#fef08a';
@@ -1376,7 +1468,7 @@
     ctx.fillStyle = '#e2e8f0';
     ctx.fillText(`💰 Total Gold Coins: ${SaveManager.totalCoins}`, VIRTUAL_WIDTH / 2, 302);
 
-    // "PLAY ESCAPE" Action Button
+    // 3. "PLAY ESCAPE" Action Button
     const pulse = 1 + Math.sin(performance.now() * 0.005) * 0.035;
     ctx.save();
     ctx.translate(VIRTUAL_WIDTH / 2, 368);
@@ -1401,7 +1493,7 @@
     ctx.fillText('▶ PLAY ESCAPE', 0, 9);
     ctx.restore();
 
-    // Jukebox Selector Button
+    // 4. Jukebox Selector Button
     drawGoldBox(ctx, VIRTUAL_WIDTH / 2 - 145, 420, 290, 48, 14);
     drawSpinningVinyl(ctx, VIRTUAL_WIDTH / 2 - 120, 444, 15, !SaveManager.isMuted);
 
@@ -1410,16 +1502,29 @@
     ctx.textAlign = 'center';
     ctx.fillText(`Track: ${audio.getCurrentTrackTitle()}`, VIRTUAL_WIDTH / 2 + 10, 451);
 
-    // Audio Toggle Button
+    // 5. Audio Toggle Button
     drawGoldBox(ctx, VIRTUAL_WIDTH / 2 - 95, 485, 190, 40, 12);
     ctx.font = '15px Outfit, sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.fillText(SaveManager.isMuted ? '🔇 Audio Muted' : '🔊 Audio Active', VIRTUAL_WIDTH / 2, 510);
 
-    // Controls Hint Banner
+    // 6. Controls Hint Banner
     ctx.font = '600 14px Outfit, sans-serif';
     ctx.fillStyle = '#cbd5e1';
     ctx.fillText('SPACE / TAP TO JUMP   •   DOUBLE JUMP MID-AIR   •   COLLECT JHUMKAS', VIRTUAL_WIDTH / 2, 555);
+
+    // 7. SINGLE Clean Character Showcase on Roadside (No overlapping duplicate sprites!)
+    const bFrame = Math.floor(menuAnimTime * 2.5) % 2;
+    const bImg = images[`basanti_cheer_${bFrame}`];
+    if (bImg && bImg.complete) {
+      ctx.drawImage(bImg, 130, 410, 105, 125);
+    }
+
+    const bikeBob = Math.sin(menuAnimTime * 4) * 2;
+    const bikeImg = images.player_run_0;
+    if (bikeImg && bikeImg.complete) {
+      ctx.drawImage(bikeImg, 220, 400 + bikeBob, 192, 128);
+    }
 
     ctx.textAlign = 'left';
   }
@@ -1482,7 +1587,6 @@
     ctx.fillStyle = GameManager.isNewRecord ? '#22c55e' : '#f59e0b';
     ctx.fillText(GameManager.isNewRecord ? '★ NAYA RECORD BAN GAYA! ★' : `Total Score: ${GameManager.currentScore} pts`, VIRTUAL_WIDTH / 2, py + 330);
 
-    // Restart Button
     const rGrad = ctx.createLinearGradient(0, py + 360, 0, py + 412);
     rGrad.addColorStop(0, '#dc2626');
     rGrad.addColorStop(1, '#991b1b');
@@ -1498,7 +1602,6 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillText('TRY AGAIN', VIRTUAL_WIDTH / 2, py + 394);
 
-    // Menu Button
     drawGoldBox(ctx, VIRTUAL_WIDTH / 2 - 100, py + 426, 200, 40, 10, 'rgba(255, 255, 255, 0.12)');
     ctx.font = '16px Outfit, sans-serif';
     ctx.fillStyle = '#ffffff';
@@ -1580,17 +1683,20 @@
     ctx.clearRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     parallax.draw(ctx);
 
-    for (const s of spectators) s.draw(ctx);
-    for (const j of jhumkas) j.draw(ctx);
-    for (const c of coins) c.draw(ctx);
-    for (const obs of obstacles) obs.draw(ctx);
-    for (const p of particles) p.draw(ctx);
+    // Active gameplay entities are ONLY drawn during running, paused, or game over states!
+    if (gameState === State.RUNNING || gameState === State.PAUSED || gameState === State.GAME_OVER) {
+      for (const s of spectators) s.draw(ctx);
+      for (const j of jhumkas) j.draw(ctx);
+      for (const c of coins) c.draw(ctx);
+      for (const obs of obstacles) obs.draw(ctx);
+      for (const p of particles) p.draw(ctx);
 
-    player.draw(ctx);
-    tangaCompanion.draw(ctx);
+      player.draw(ctx);
+      tangaCompanion.draw(ctx);
+      DialogueSystem.draw(ctx);
+    }
 
-    DialogueSystem.draw(ctx);
-
+    // Draw UI Overlays
     if (gameState === State.RUNNING) {
       drawHUD(ctx);
     } else if (gameState === State.MENU) {
@@ -1605,7 +1711,7 @@
   }
 
   // -------------------------------------------------------------
-  // 17. INPUT HANDLING (Touch, Click & Keyboard with Audio Unlock)
+  // 17. INPUT HANDLING (Touch, Click & Keyboard with Instant Audio Unlock)
   // -------------------------------------------------------------
   function getCoordsFromClient(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
@@ -1673,7 +1779,6 @@
     }
 
     if (gameState === State.GAME_OVER) {
-      // Main menu button
       if (pos.x >= VIRTUAL_WIDTH / 2 - 100 && pos.x <= VIRTUAL_WIDTH / 2 + 100 &&
           pos.y >= 505 && pos.y <= 555) {
         audio.playSFX('button');
@@ -1681,13 +1786,11 @@
         audio.playBGM('Yeh Dosti');
         return;
       }
-      // Try again
       startGame();
       return;
     }
 
     if (gameState === State.PAUSED) {
-      // Quit to menu
       if (pos.x >= VIRTUAL_WIDTH / 2 - 100 && pos.x <= VIRTUAL_WIDTH / 2 + 100 &&
           pos.y >= 355 && pos.y <= 397) {
         audio.playSFX('button');
@@ -1695,7 +1798,6 @@
         audio.playBGM('Yeh Dosti');
         return;
       }
-      // Resume
       audio.playSFX('button');
       gameState = State.RUNNING;
       return;
@@ -1718,7 +1820,6 @@
   });
 
   canvas.addEventListener('mousedown', (e) => {
-    // Avoid duplicate events on touch devices
     if (performance.now() - lastTouchTime < 400) return;
     handleInteraction(getCoordsFromClient(e.clientX, e.clientY));
   });
@@ -1728,7 +1829,7 @@
     if (gameState === State.RUNNING) player.cutJump();
   });
 
-  // Universal Audio Unlock on any interaction
+  // Universal User Interaction Listener for Audio Unlock
   window.addEventListener('pointerdown', () => audio.unlock(), { passive: true });
 
   // Keyboard controls

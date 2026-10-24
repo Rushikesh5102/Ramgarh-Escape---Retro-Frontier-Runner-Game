@@ -21,124 +21,106 @@ def generate_basanti_cheer():
         img = Image.new("RGBA", (110, 130), (0, 0, 0, 0))
         d = ImageDraw.Draw(img)
         
-        sway = -2.5 if f == 0 else 2.5
-        arm_lift = -5.0 if f == 0 else 3.0
-        chunni_wave = -8.0 if f == 0 else 8.0
+        sway = -2.0 if f == 0 else 2.0
+        arm_lift = -4.0 if f == 0 else 2.5
+        chunni_wave = -6.0 if f == 0 else 6.0
         
         # Ground Shadow
-        d.ellipse([28 + sway, 118, 82 + sway, 128], fill=(30, 20, 10, 90))
+        d.ellipse([34 + sway, 120, 76 + sway, 127], fill=(25, 15, 20, 85))
         
-        # 1. Long Dark Braided Hair with White Jasmine Gajra
+        # 1. Flowing Sheer Dupatta in Background (trailing behind shoulders)
+        d.polygon([
+            (44 + sway, 44),
+            (22 + chunni_wave, 52),
+            (14 + chunni_wave, 85),
+            (28 + chunni_wave, 78),
+            (46 + sway, 60)
+        ], fill=(253, 224, 71, 160))
+        d.line([(22 + chunni_wave, 52), (14 + chunni_wave, 85)], fill=(245, 158, 11, 220), width=2)
+
+        d.polygon([
+            (66 + sway, 44),
+            (88 - chunni_wave, 52),
+            (96 - chunni_wave, 85),
+            (82 - chunni_wave, 78),
+            (64 + sway, 60)
+        ], fill=(253, 224, 71, 160))
+        d.line([(88 - chunni_wave, 52), (96 - chunni_wave, 85)], fill=(245, 158, 11, 220), width=2)
+
+        # 2. Long Dark Braided Hair with White Jasmine Gajra
         hair_x = 55 + sway
-        d.line([hair_x + 9, 38, hair_x + 18 + sway, 80], fill=(20, 15, 15, 255), width=7)
-        # Jasmine flowers (delicate white gajra clusters)
-        for gy in range(42, 80, 7):
-            d.ellipse([hair_x + 16 + sway, gy - 3, hair_x + 22 + sway, gy + 3], fill=(255, 255, 240, 255))
-            d.ellipse([hair_x + 18 + sway, gy - 1, hair_x + 20 + sway, gy + 1], fill=(254, 240, 138, 255))
+        d.line([hair_x + 6, 36, hair_x + 14 + sway, 80], fill=(22, 18, 20, 255), width=6)
+        for gy in range(40, 78, 6):
+            d.ellipse([hair_x + 12 + sway, gy - 2, hair_x + 17 + sway, gy + 2], fill=(255, 255, 245, 255))
         
-        # 2. Lehenga Skirt (Flared Marigold / Saffron with Gold Embroidery & Latkans)
+        # 3. Flared Flowing Lehenga Skirt (Saffron with rich crimson shaded pleats)
         skirt_poly = [
-            (48 + sway, 65),
-            (62 + sway, 65),
-            (82 + sway * 1.5, 120),
-            (28 + sway * 1.5, 120)
+            (50 + sway, 66),
+            (60 + sway, 66),
+            (76 + sway * 1.3, 118),
+            (34 + sway * 1.3, 118)
         ]
         d.polygon(skirt_poly, fill=(245, 158, 11, 255)) # Rich Saffron
         
-        # Pleat folds shading
-        for px in [-14, -7, 0, 7, 14]:
-            top_px = 55 + sway + px * 0.35
-            bot_px = 55 + sway * 1.5 + px * 1.6
-            d.line([(top_px, 66), (bot_px, 116)], fill=(217, 119, 6, 255), width=2)
-            # Floral gold stencils on skirt panels
-            d.polygon([(bot_px - 3, 98), (bot_px + 3, 98), (bot_px, 93)], fill=(254, 240, 138, 255))
+        # Curved pleat shadows for 3D fullness
+        for px in [-10, -5, 0, 5, 10]:
+            top_px = 55 + sway + px * 0.4
+            bot_px = 55 + sway * 1.3 + px * 1.8
+            d.line([(top_px, 68), (bot_px, 114)], fill=(217, 119, 6, 255), width=2)
+            d.polygon([(bot_px - 2, 98), (bot_px + 2, 98), (bot_px, 92)], fill=(254, 240, 138, 255))
             
-        # Ornate Gold & Crimson Bottom Border (Gota Patti)
-        d.line([(28 + sway * 1.5, 114), (82 + sway * 1.5, 114)], fill=(185, 28, 28, 255), width=5) # Crimson velvet
-        d.line([(28 + sway * 1.5, 118), (82 + sway * 1.5, 118)], fill=(250, 204, 21, 255), width=3) # Heavy gold
-        # Hanging golden tassels (Latkans)
-        for tx in range(int(30 + sway * 1.5), int(82 + sway * 1.5), 7):
-            d.line([(tx, 118), (tx, 123)], fill=(254, 240, 138, 255), width=2)
-            d.ellipse([tx - 1, 122, tx + 2, 125], fill=(220, 38, 38, 255))
+        # Ornate Crimson Velvet & Heavy Gold Border (Gota Patti)
+        d.line([(34 + sway * 1.3, 114), (76 + sway * 1.3, 114)], fill=(185, 28, 28, 255), width=4)
+        d.line([(34 + sway * 1.3, 117), (76 + sway * 1.3, 117)], fill=(250, 204, 21, 255), width=3)
+        for tx in range(int(36 + sway * 1.3), int(76 + sway * 1.3), 6):
+            d.line([(tx, 117), (tx, 121)], fill=(254, 240, 138, 255), width=2)
+            d.ellipse([tx - 1, 120, tx + 1, 122], fill=(220, 38, 38, 255))
             
-        # Ornate Waist Belt (Kamarbandh)
-        d.line([(48 + sway, 65), (62 + sway, 65)], fill=(250, 204, 21, 255), width=3)
-        d.ellipse([54 + sway, 66, 56 + sway, 72], fill=(220, 38, 38, 255))
+        # Ornate Gold Kamarbandh (Waist Chain)
+        d.line([(50 + sway, 66), (60 + sway, 66)], fill=(250, 204, 21, 255), width=2)
+        d.ellipse([54 + sway, 67, 56 + sway, 71], fill=(220, 38, 38, 255))
         
-        # 3. Choli Blouse (Vibrant Fuchsia / Magenta Pink with Gold Neckline)
-        d.polygon([(46 + sway, 44), (64 + sway, 44), (62 + sway, 65), (48 + sway, 65)], fill=(219, 39, 119, 255))
-        # Gold neckline embroidery
-        d.arc([47 + sway, 42, 63 + sway, 52], start=0, end=180, fill=(250, 204, 21, 255), width=2)
-        # Midriff skin
-        d.rectangle([50 + sway, 62, 60 + sway, 65], fill=(230, 180, 140, 255))
+        # 4. Fitted Choli Blouse (Vibrant Fuchsia Pink with Gold Embroidered Neckline)
+        d.polygon([(48 + sway, 46), (62 + sway, 46), (60 + sway, 66), (50 + sway, 66)], fill=(219, 39, 119, 255))
+        d.arc([49 + sway, 44, 61 + sway, 52], start=0, end=180, fill=(250, 204, 21, 255), width=2)
+        d.rectangle([52 + sway, 63, 58 + sway, 66], fill=(228, 172, 132, 255)) # Midriff
         
-        # 4. Graceful Neck, Face & Golden Jewelry
-        d.rectangle([52 + sway, 36, 58 + sway, 44], fill=(230, 180, 140, 255))
-        # Gold Choker Necklace
-        d.arc([51 + sway, 38, 59 + sway, 44], start=0, end=180, fill=(250, 204, 21, 255), width=2)
+        # 5. Neck, Graceful Face & Golden Jewelry
+        d.rectangle([53 + sway, 38, 57 + sway, 46], fill=(228, 172, 132, 255))
+        d.arc([52 + sway, 40, 58 + sway, 46], start=0, end=180, fill=(250, 204, 21, 255), width=2)
         
-        # Head / Face
-        d.ellipse([47 + sway, 18, 63 + sway, 38], fill=(238, 192, 152, 255))
-        # Cheerful ruby-red lips smile
-        d.arc([51 + sway, 27, 59 + sway, 34], start=10, end=170, fill=(190, 24, 93, 255), width=2)
-        # Expressive Kohl-rimmed eyes
-        d.ellipse([49 + sway, 24, 52 + sway, 27], fill=(30, 15, 15, 255))
-        d.ellipse([58 + sway, 24, 61 + sway, 27], fill=(30, 15, 15, 255))
-        # Eye glints
-        d.point((50 + sway, 25), fill=(255, 255, 255, 255))
-        d.point((59 + sway, 25), fill=(255, 255, 255, 255))
-        # Red Vermilion Bindi & Golden Maang-Tikka
-        d.ellipse([54 + sway, 21, 56 + sway, 23], fill=(220, 38, 38, 255))
-        d.line([55 + sway, 18, 55 + sway, 21], fill=(250, 204, 21, 255), width=1)
-        # Sparkling Nose Ring (Nath) with Chain
-        d.arc([56 + sway, 26, 60 + sway, 30], start=0, end=360, fill=(250, 204, 21, 255), width=1)
-        d.line([(59 + sway, 27), (62 + sway, 24)], fill=(250, 204, 21, 255), width=1)
+        # Beautiful Face
+        d.ellipse([49 + sway, 20, 61 + sway, 38], fill=(234, 180, 140, 255))
+        # Warm confident smile
+        d.arc([52 + sway, 28, 58 + sway, 34], start=10, end=170, fill=(190, 24, 93, 255), width=2)
+        # Expressive eyes
+        d.ellipse([51 + sway, 25, 53 + sway, 28], fill=(30, 18, 18, 255))
+        d.ellipse([57 + sway, 25, 59 + sway, 28], fill=(30, 18, 18, 255))
+        d.point((51 + sway, 26), fill=(255, 255, 255, 255))
+        d.point((57 + sway, 26), fill=(255, 255, 255, 255))
+        # Bindi & Maang-Tikka
+        d.ellipse([54 + sway, 22, 56 + sway, 24], fill=(220, 38, 38, 255))
+        d.line([55 + sway, 19, 55 + sway, 22], fill=(250, 204, 21, 255), width=1)
+        # Delicate Nose Ring (Nath)
+        d.arc([56 + sway, 27, 59 + sway, 30], start=0, end=360, fill=(250, 204, 21, 255), width=1)
         
-        # Front curls
-        d.arc([47 + sway, 17, 63 + sway, 26], start=180, end=360, fill=(20, 15, 15, 255), width=4)
+        # Hair curls
+        d.arc([48 + sway, 18, 62 + sway, 27], start=180, end=360, fill=(24, 18, 20, 255), width=3)
         
-        # Multi-tiered Dangling Jhumkas
-        for jx in [46 + sway, 64 + sway]:
-            d.line([(jx, 28), (jx, 33)], fill=(250, 204, 21, 255), width=2)
-            d.polygon([(jx - 3, 33), (jx + 3, 33), (jx, 38)], fill=(250, 204, 21, 255))
-            d.ellipse([jx - 1, 38, jx + 1, 40], fill=(255, 255, 245, 255)) # Pearl drop
+        # Dangling Jhumkas
+        for jx in [48 + sway, 62 + sway]:
+            d.line([(jx, 28), (jx, 32)], fill=(250, 204, 21, 255), width=2)
+            d.polygon([(jx - 2, 32), (jx + 2, 32), (jx, 36)], fill=(250, 204, 21, 255))
+            d.ellipse([jx - 1, 36, jx + 1, 38], fill=(255, 255, 245, 255))
             
-        # 5. Arms (Raised cheering gesture with colorful bangles)
-        # Left arm
-        d.line([(47 + sway, 46), (32 + sway, 38 + arm_lift), (26 + sway, 22 + arm_lift)], fill=(230, 180, 140, 255), width=5)
-        # Right arm
-        d.line([(63 + sway, 46), (78 + sway, 38 - arm_lift), (84 + sway, 22 - arm_lift)], fill=(230, 180, 140, 255), width=5)
-        # Colorful Glass Bangles (Choodiyan - red, green, gold)
-        for arm_x, arm_y in [(30 + sway, 32 + arm_lift), (80 + sway, 30 - arm_lift)]:
-            d.ellipse([arm_x - 3, arm_y - 3, arm_x + 3, arm_y + 3], fill=(220, 38, 38, 255))
-            d.ellipse([arm_x - 2, arm_y - 2, arm_x + 2, arm_y + 2], fill=(22, 163, 74, 255)) # Green
-            d.ellipse([arm_x - 1, arm_y - 1, arm_x + 1, arm_y + 1], fill=(250, 204, 21, 255)) # Gold
-            
-        # 6. Flowing Sheer Yellow Dupatta / Chunni waving in wind with Gold Stars
-        chunni_poly = [
-            (47 + sway, 18),
-            (42 + sway, 46),
-            (22 + chunni_wave, 56),
-            (14 + chunni_wave, 78),
-            (26 + chunni_wave, 72),
-            (48 + sway, 62),
-            (64 + sway, 68),
-            (94 - chunni_wave, 62),
-            (102 - chunni_wave, 40),
-            (63 + sway, 28)
-        ]
-        d.polygon(chunni_poly, fill=(253, 224, 71, 195)) # Sheer golden yellow
-        d.line(chunni_poly, fill=(245, 158, 11, 240), width=2) # Gold Gota border
-        # Sparkling gold sitaras (stars on dupatta)
-        for sx, sy in [(28 + chunni_wave, 66), (86 - chunni_wave, 50), (55 + sway, 48)]:
-            d.point((sx, sy), fill=(255, 255, 255, 255))
-            d.line([(sx - 2, sy), (sx + 2, sy)], fill=(254, 240, 138, 220), width=1)
-            d.line([(sx, sy - 2), (sx, sy + 2)], fill=(254, 240, 138, 220), width=1)
-            
-        # Rose petals floating around
-        for rx, ry in [(22 + sway, 16), (88 + sway, 12), (94, 90)]:
-            d.ellipse([rx, ry, rx + 6, ry + 5], fill=(244, 63, 94, 240))
-            d.line([(rx + 1, ry + 2), (rx + 4, ry + 2)], fill=(255, 255, 255, 180), width=1)
+        # 6. Graceful Arms (raised cheering gesture with bangles)
+        d.line([(48 + sway, 48), (36 + sway, 38 + arm_lift), (30 + sway, 24 + arm_lift)], fill=(228, 172, 132, 255), width=4)
+        d.line([(62 + sway, 48), (74 + sway, 38 - arm_lift), (80 + sway, 24 - arm_lift)], fill=(228, 172, 132, 255), width=4)
+        # Bangles (Choodiyan)
+        for arm_x, arm_y in [(34 + sway, 32 + arm_lift), (76 + sway, 30 - arm_lift)]:
+            d.line([(arm_x - 2, arm_y), (arm_x + 2, arm_y)], fill=(220, 38, 38, 255), width=2)
+            d.line([(arm_x - 2, arm_y - 2), (arm_x + 2, arm_y - 2)], fill=(22, 163, 74, 255), width=2)
+            d.line([(arm_x - 2, arm_y + 2), (arm_x + 2, arm_y + 2)], fill=(250, 204, 21, 255), width=2)
             
         img.save(f"assets/sprites/basanti_cheer_{f}.png")
         print(f"Generated enhanced assets/sprites/basanti_cheer_{f}.png")
