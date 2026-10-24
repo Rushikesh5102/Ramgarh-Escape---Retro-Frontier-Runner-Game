@@ -1,42 +1,54 @@
-# Ramgarh Escape
+# 🏍️ Ramgarh Escape — 2D Retro Frontier Runner Game
 
-[![Live Web Game](https://img.shields.io/badge/Play%20Online-GitHub%20Pages-brightgreen.svg?style=for-the-badge&logo=github)](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
-[![Engine](https://img.shields.io/badge/Engine-Godot%204.7.2-blue.svg)](https://godotengine.org)
-[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Windows%20%7C%20Android-orange.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](./LICENSES.md)
-
-> ### 🌐 [Play Ramgarh Escape Live on GitHub Pages](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
-> Instant play in any browser (mobile & desktop) with rich Bollywood soundtracks, Basanti & Dhanno Rush, and social sharing previews!
-
-![Ramgarh Escape Preview Banner](./preview.png)
-
-**"Ramgarh Escape"** is a 2D endless-runner game inspired by retro frontier adventures and the classic Bollywood epic *Sholay*.
-
-Control the daring duo—**Veeru** and **Jai**—escaping through dusty desert frontiers and rocky sandstone gorges on their vintage sidecar motorcycle, accompanied by **Basanti** in her spirited horse carriage with **Dhanno**!
+[![Play Live on GitHub Pages](https://img.shields.io/badge/🎮_Play_Live-GitHub_Pages-brightgreen?style=for-the-badge&logo=github)](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
+[![Engine](https://img.shields.io/badge/Engine-Godot%204.7.2-blue.svg?style=for-the-badge)](https://godotengine.org)
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Windows%20%7C%20Android-orange.svg?style=for-the-badge)]()
+[![Automated Tests](https://img.shields.io/badge/Tests-107%2F107%20Passed-success?style=for-the-badge)]()
+[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=for-the-badge)](./LICENSES.md)
 
 ---
 
-## Game Highlights & Features
+### 🌐 **Live Web Game:** [https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/](https://rushikesh5102.github.io/Ramgarh-Escape---Retro-Frontier-Runner-Game/)
 
-1. **Original Visual Style & Character Art:**
-   - Original cartoon characters with humorous dynamic animations (suspension bouncing, spinning wheel spokes, flapping scarf, exhaust smoke rings, landing dust, and crash wobble).
-   - 4-layer infinite parallax background: sunset desert sky with warm glowing sun, distant Ramgarh village fortress ridge, midground sandstone cliffs with saguaro cacti, and foreground dusty road with tire tracks.
+> **Instant Play:** Jump straight into the action directly in your browser on both mobile and desktop! Featuring realistic Bollywood character art, continuous studio-recorded soundtracks from *Sholay*, Basanti & Dhanno carriage companion, and interactive Jukebox!
 
-2. **Juicy Movement & Physics:**
-   - Automatic forward scrolling with gentle acceleration (350 px/s up to 680 px/s).
-   - Crisp, responsive jump physics with variable jump height (short hop vs high leap).
-   - Coyote time (0.12s grace window after leaving ground) and jump buffering (0.12s prior to landing).
-   - Guaranteed floor collision snapping—impossible to fall through or get stuck.
+---
 
-3. **Dynamic Obstacles & Collectibles:**
-   - Multiple obstacle hazards: Sandstone Boulders, Broken Bullock Carts, TNT Dynamite Crates, and Bandit Road Spikes.
-   - Dynamic jump distance scaling: obstacles never appear in impossible combinations and always leave >= 480 px reaction space.
-   - 6-frame spinning 3D golden frontier coins (Mohurs) spawned in parabolic jump arcs above obstacles and straight speed runs.
+![Ramgarh Escape Social Preview Banner](./preview.png)
 
-4. **Original Sound Effects & Looping Music:**
-   - Synthesized 16-bit 44.1kHz audio effects: jump sweep, landing thud, bright dual-tone coin chime (E6->B6), impact crash, comedic game-over slide, and triumphant high-score fanfare.
-   - Catchy, looping 8-bar retro frontier chase music track (`bgm_escape.wav`) at 138 BPM.
-   - Dedicated audio pool preventing sound clipping or cutoffs.
+**"Ramgarh Escape"** is an action-packed 2D endless retro frontier runner game inspired by Indian cinema's greatest masterpiece, *Sholay* (1975).
+
+Take control of the daring outlaw duo—**Veeru** and **Jai**—escaping through rugged sandstone gorges and dusty desert frontiers on their vintage yellow BSA motorbike with sidecar. Collect golden Mohurs and Basanti's sparkling Jhumkas, dodge sandstone boulders, bullock carts, and dynamite crates, and unleash **Dhanno Rush** alongside **Basanti**!
+
+---
+
+## 🌟 Key Highlights & Gameplay Features
+
+1. **Realistic, High-Definition Bollywood Character Sprites:**
+   - **Veeru & Jai on Motorbike:** Dharmendra (Veeru) in his red headband, mustache, and leather vest driving the retro BSA motorcycle with sidecar, carrying Amitabh Bachchan (Jai) in his denim jacket and aviator sunglasses.
+   - **Basanti & Dhanno Tanga Companion:** Hema Malini (Basanti) in traditional Rajasthani yellow-and-pink embroidered lehenga choli with flowing sheer dupatta steering a vintage carved wooden tanga carriage pulled by Dhanno the galloping white mare.
+   - **Basanti Cheering Spectator:** Roadside cheering animations with authentic ghungroo and jewelry.
+   - **HD Dialogue Avatars:** High-definition character medallions for Jai, Veeru, Basanti, Gabbar Singh, and Radha.
+
+2. **Continuous Authentic Bollywood Soundtrack:**
+   - **Studio-Quality MP3 Soundtracks:** Real musical tracks from *Sholay*:
+     - 🎵 *"Yeh Dosti Hum Nahin Todenge"* — Kishore Kumar & Manna Dey
+     - 🎵 *"Mehbooba Mehbooba"* — R.D. Burman
+     - 🎵 *"Chal Dhanno! (Haan Jab Tak Hai Jaan)"* — Lata Mangeshkar
+     - 🎵 *"Frontier Escape (Title Music)"* — R.D. Burman
+     - 🎵 *"Koi Haseena Jab Rooth Jaati Hai"* — Kishore Kumar
+   - **Continuous, Uninterrupted Music:** Music never restarts or abruptly cuts off when triggering special effects, collecting jhumkas, entering Fever Rush, or upon death. It only switches when the player selects a new track on the Jukebox!
+   - **Interactive Jukebox:** Switch tracks anytime on the main menu or in-game HUD.
+
+3. **Fluid Movement & Dual-Jump Physics:**
+   - Smooth forward acceleration from 350 px/s up to 680 px/s.
+   - Grounded primary jump with variable jump-height hold.
+   - Mid-air double jump with aerodynamic tilt and sparkle trail.
+   - Coyote time (0.15s grace window) and pre-landing jump buffering.
+
+4. **Dynamic Dhanno Rush (Fever Mode):**
+   - Collect sparkling gold Jhumkas to charge the fever meter to 100%.
+   - Basanti and Dhanno gallop alongside in their wooden tanga carriage, giving speed boosts, magnetizing gold coins, and invincible obstacle smashing!
 
 5. **Humorous Buddy Banter Dialogue:**
    - Dynamic comic speech bubbles popping up over the characters during jumps, coin streaks, and crashes with color-coded speaker tags.
@@ -78,15 +90,15 @@ To inspect scenes, modify gameplay, or view assets:
 
 ---
 
-## Automated Test Suite
+## Automated Test Suite (107/107 Tests Passing)
 
-A complete test suite is included in the project:
-- **Unit & System Tests:** `tests/test_runner_scene.gd` (59 tests covering SaveManager, AudioManager, GameManager, Physics, Obstacles, Coins, and Parallax).
+A comprehensive automated test suite verifies all game components with **107 passed assertions and 0 failures**:
+- **Unit & System Tests:** `tests/test_runner_scene.gd` (SaveManager persistence, AudioManager & MP3 Jukebox streaming, GameManager state transitions, player jump physics, obstacle spawner clearance calculations, coin collection, Basanti companion, and fever mode).
 - **Live Physics Simulation:** `tests/gameplay_sim_test.gd` (simulates 300 physics frames of active jumping, airborne states, landing impact, and speed scaling).
 
-To run tests headless via terminal:
+To run the automated tests in 1 click:
 ```powershell
-& "C:\Users\Rushi\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe" --headless "res://tests/test_runner.tscn"
+.\run_game.bat --test
 ```
 
 ---
