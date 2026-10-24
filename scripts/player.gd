@@ -62,9 +62,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
-		# Apply gravity on crash
+		# Apply gravity and ground deceleration on crash
 		if not is_on_floor():
 			velocity.y += GRAVITY * delta
+		else:
+			velocity.x = move_toward(velocity.x, 0.0, 600.0 * delta)
 		move_and_slide()
 		return
 		

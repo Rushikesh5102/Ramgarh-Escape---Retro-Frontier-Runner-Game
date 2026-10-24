@@ -23,9 +23,19 @@ const MIDGROUND_FACTOR: float = 0.45
 const ROAD_FACTOR: float = 1.00
 
 func _process(delta: float) -> void:
-	# Idle gentle ambient scroll in menu/ready, active scroll in running
-	var speed = GameManager.current_speed if GameManager.current_state == GameManager.State.RUNNING else 50.0
+	# Active scroll during gameplay, gentle ambient drift in main menu only.
+	# When losing (GAME_OVER) or paused, scrolling immediately freezes to a dead stop.
+	var speed: float = 0.0
+	if GameManager.current_state == GameManager.State.RUNNING:
+		speed = GameManager.current_speed
+	elif GameManager.current_state == GameManager.State.MENU:
+		speed = 50.0
+	else:
+		speed = 0.0
 	
+	if speed <= 0.0:
+		return
+		
 	scroll_layer(sky_1, sky_2, speed * SKY_FACTOR * delta)
 	scroll_layer(mtn_1, mtn_2, speed * MOUNTAIN_FACTOR * delta)
 	scroll_layer(mid_1, mid_2, speed * MIDGROUND_FACTOR * delta)
