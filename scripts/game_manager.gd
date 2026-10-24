@@ -110,8 +110,8 @@ func activate_fever() -> void:
 	fever_timer = FEVER_DURATION
 	fever_meter = 100.0
 	fever_changed.emit(100.0, true)
-	AudioManager.play_bgm("Chal Dhanno!")
 	AudioManager.play_sfx("fever_start")
+	AudioManager.play_sfx("dhanno_gallop")
 	var dialogue = get_node_or_null("/root/Main/DialogueSystem")
 	if dialogue:
 		dialogue.trigger_fever_banter()
@@ -120,14 +120,12 @@ func end_fever() -> void:
 	is_fever_active = false
 	fever_meter = 0.0
 	fever_changed.emit(0.0, false)
-	AudioManager.play_bgm("Yeh Dosti")
 
 func trigger_game_over() -> void:
 	if current_state == State.GAME_OVER:
 		return
 	current_state = State.GAME_OVER
 	is_fever_active = false
-	AudioManager.stop_bgm()
 	AudioManager.play_sfx("hit")
 	
 	# Update persistent high scores

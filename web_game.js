@@ -137,46 +137,53 @@
       }
     }
 
-    // Play authentic Bollywood studio MP3 soundtrack
-    playBGM(trackTitle = '') {
+    // Play authentic Bollywood studio MP3 soundtrack continuously
+    playBGM(trackTitle = '', forceRestart = false) {
       if (SaveManager.isMuted) return;
 
+      let changed = false;
       if (trackTitle) {
         const idx = this.tracks.findIndex(t => t.title.toLowerCase() === trackTitle.toLowerCase());
-        if (idx !== -1) this.currentTrackIdx = idx;
+        if (idx !== -1 && idx !== this.currentTrackIdx) {
+          this.currentTrackIdx = idx;
+          changed = true;
+        }
       }
 
       const track = this.tracks[this.currentTrackIdx];
-      if (this.activeTrackTitle === track.title && !this.bgmPlayer.paused) {
-        return; // already smoothly playing this song
+
+      // If already playing this track smoothly, DO NOT restart or interrupt!
+      if (!changed && !forceRestart && this.activeTrackTitle === track.title && !this.bgmPlayer.paused) {
+        return;
       }
 
-      this.activeTrackTitle = track.title;
-      this.bgmPlayer.src = track.file;
-      this.bgmPlayer.currentTime = 0;
+      if (changed || forceRestart || this.activeTrackTitle !== track.title || !this.bgmPlayer.src) {
+        this.activeTrackTitle = track.title;
+        this.bgmPlayer.src = track.file;
+        this.bgmPlayer.currentTime = 0;
+      }
+
       this.bgmPlayer.muted = SaveManager.isMuted;
       this.bgmPlayer.volume = 0.85;
 
       const p = this.bgmPlayer.play();
       if (p !== undefined) {
         p.catch(() => {
-          // Will resume seamlessly upon the user's next tap / keystroke
+          // Resumes seamlessly on the next user interaction
         });
       }
     }
 
     stopBGM() {
-      this.activeTrackTitle = '';
       if (this.bgmPlayer) {
         this.bgmPlayer.pause();
-        this.bgmPlayer.currentTime = 0;
       }
     }
 
     nextTrack() {
       this.currentTrackIdx = (this.currentTrackIdx + 1) % this.tracks.length;
       if (!SaveManager.isMuted) {
-        this.playBGM();
+        this.playBGM('', true); // Player explicitly clicked Jukebox -> switch and start new track
       }
       return this.tracks[this.currentTrackIdx].title;
     }
@@ -677,21 +684,19 @@
       this.isFeverActive = true;
       this.feverTimer = this.feverDuration;
       this.feverMeter = 100;
-      audio.playBGM('Chal Dhanno!');
       audio.playSFX('fever_start');
+      audio.playSFX('dhanno_gallop');
       DialogueSystem.trigger('fever');
     },
 
     endFever() {
       this.isFeverActive = false;
       this.feverMeter = 0;
-      audio.playBGM('Yeh Dosti');
     },
 
     gameOver() {
       gameState = State.GAME_OVER;
       this.isFeverActive = false;
-      audio.stopBGM();
       audio.playSFX('hit');
 
       this.isNewRecord = SaveManager.updateHighScore(this.currentScore, Math.floor(this.distanceTraveled));
@@ -881,8 +886,8 @@
       ctx.translate(this.x, this.y);
       ctx.scale(this.scaleX, this.scaleY);
 
-      const w = 192;
-      const h = 128;
+      const w = 210;
+      const h = 135;
 
       if (GameManager.isFeverActive) {
         ctx.save();
@@ -894,16 +899,6 @@
       }
 
       ctx.drawImage(img, -w / 2, -h, w, h);
-
-      if (GameManager.isFeverActive) {
-        ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
-        ctx.lineWidth = 3;
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.roundRect(-w / 2 + 8, -h + 8, w - 16, h - 16, 16);
-        ctx.stroke();
-      }
 
       ctx.restore();
     }
@@ -926,7 +921,7 @@
       if (!GameManager.isFeverActive) {
         this.x += 720 * dt;
       } else {
-        const targetX = player.x + 160;
+        const targetX = player.x + 230;
         this.x += (targetX - this.x) * 4.5 * dt;
 
         this.dustTimer += dt;
@@ -939,17 +934,13 @@
     }
 
     draw(ctx) {
-      if (this.x < -220 || this.x > VIRTUAL_WIDTH + 240) return;
+      if (this.x < -240 || this.x > VIRTUAL_WIDTH + 260) return;
       const f = Math.floor(this.animTimer) % 2;
       const img = images[`basanti_tanga_${f}`];
       if (!img || !img.complete) return;
 
       ctx.save();
-      if (GameManager.isFeverActive) {
-        ctx.shadowColor = '#facc15';
-        ctx.shadowBlur = 16;
-      }
-      ctx.drawImage(img, this.x - 110, this.y - 135, 220, 140);
+      ctx.drawImage(img, this.x - 120, this.y - 145, 240, 150);
       ctx.restore();
     }
   }
@@ -1370,17 +1361,17 @@
     ctx.fillStyle = '#cbd5e1';
     ctx.fillText('SPACE / TAP TO JUMP   •   DOUBLE JUMP MID-AIR   •   COLLECT JHUMKAS', VIRTUAL_WIDTH / 2, 555);
 
-    // 7. SINGLE Clean Character Showcase on Roadside (No overlapping duplicate sprites!)
+    // 7. SINGLE Clean Character Showcase on Roadside (Realistic Bollywood Sprites)
     const bFrame = Math.floor(menuAnimTime * 2.5) % 2;
     const bImg = images[`basanti_cheer_${bFrame}`];
     if (bImg && bImg.complete) {
-      ctx.drawImage(bImg, 130, 410, 105, 125);
+      ctx.drawImage(bImg, 120, 395, 110, 135);
     }
 
     const bikeBob = Math.sin(menuAnimTime * 4) * 2;
     const bikeImg = images.player_run_0;
     if (bikeImg && bikeImg.complete) {
-      ctx.drawImage(bikeImg, 220, 400 + bikeBob, 192, 128);
+      ctx.drawImage(bikeImg, 220, 390 + bikeBob, 210, 135);
     }
 
     ctx.textAlign = 'left';
@@ -1587,7 +1578,7 @@
     player.reset();
     resetSpawner();
     gameState = State.RUNNING;
-    audio.playBGM('Yeh Dosti');
+    audio.playBGM();
   }
 
   function handleInteraction(pos) {
@@ -1640,7 +1631,7 @@
           pos.y >= 505 && pos.y <= 555) {
         audio.playSFX('button');
         gameState = State.MENU;
-        audio.playBGM('Yeh Dosti');
+        audio.playBGM();
         return;
       }
       startGame();
@@ -1652,7 +1643,7 @@
           pos.y >= 355 && pos.y <= 397) {
         audio.playSFX('button');
         gameState = State.MENU;
-        audio.playBGM('Yeh Dosti');
+        audio.playBGM();
         return;
       }
       audio.playSFX('button');
